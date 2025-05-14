@@ -29,13 +29,13 @@ export default function TabLayout() {
         }}
     >
         <Tabs.Screen name="index" options={{ 
-            title: "Play",
+            title: "TestHaptic",
             tabBarIcon: ({color, focused}) => (
                 <Ionicons name={focused ? "play-circle" : "play-circle-outline"} size={24} color={color} />
             ),
             }} />
-        <Tabs.Screen name="About" options={{ 
-            title: "About",
+        <Tabs.Screen name="testgyro" options={{ 
+            title: "Test Gyro",
             tabBarIcon: ({color, focused}) => (
                 <Ionicons name={focused ? "add-circle" : "add-circle-outline"} size={24} color={color} />
             ),

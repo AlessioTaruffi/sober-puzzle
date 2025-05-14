@@ -1,7 +1,7 @@
 import * as Haptics from 'expo-haptics';
 import { Button, StyleSheet, Text, View } from 'react-native';
 
-export default function App() {
+export default function TestHaptic() {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Haptics.selectionAsync</Text>
