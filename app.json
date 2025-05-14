@@ -37,6 +37,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "b2afb7ad-06b4-4db1-9490-323c890f39b0"
+      }
+    },
+    "owner": "donmatteo-org"
   }
 }
