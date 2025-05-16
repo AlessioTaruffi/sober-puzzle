@@ -1,5 +1,9 @@
 import { Stack } from 'expo-router';
 
+/*
+Vecchio layout per implementare i tab
+Al momento rimossi, implementabili in seguito se necessario 
+
 export default function RootLayout() {
   return (
     <Stack>
@@ -8,3 +12,9 @@ export default function RootLayout() {
     </Stack>
   );
 }
+*/
+
+export default function RootLayout() {
+  return <Stack />;
+}
+

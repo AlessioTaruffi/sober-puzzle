@@ -1,13 +1,13 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
   Alert,
-  Vibration,
-  Platform,
   Dimensions,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  Vibration,
+  View,
 } from 'react-native';
 
 const COLORS = ['red', 'blue', 'green', 'yellow', 'purple', 'orange'];
