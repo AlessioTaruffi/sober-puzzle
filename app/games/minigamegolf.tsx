@@ -9,11 +9,44 @@ export default function MinigameGolf() {
     const SCREEN_WIDTH = Dimensions.get("window").width;
     const SCREEN_HEIGHT = Dimensions.get("window").height;
 
+    const [gyroBias, setGyroBias] = useState({ x: 0, y: 0 });
+    const [isCalibrating, setIsCalibrating] = useState(true);
+
+    const calibrateGyroscope = async () => {
+        setIsCalibrating(true);
+
+        
+
+        const samples: { x: number; y: number; z: number }[] = [];
+        const subscription = Gyroscope.addListener(data => {
+            samples.push(data);
+        });
+
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        subscription.remove();
+
+        const average = samples.reduce(
+            (acc, val) => ({
+                x: acc.x + val.x / samples.length,
+                y: acc.y + val.y / samples.length,
+                z: acc.z + val.z / samples.length,
+            }),
+            { x: 0, y: 0, z: 0 }
+        );
+
+        setGyroBias({ x: average.x, y: average.y });
+        setIsCalibrating(false);
+    };
+
+      
+    
+
     //stato del giroscopio
     const [{ x, y }, setGyroData] = useState({ x: 0, y: 0, z: 0 });
 
     //spostamento orizzontale per centrare il percorso
-    const pathOffsetX = SCREEN_WIDTH / 2 - 75;
+    const pathOffsetX = SCREEN_WIDTH / 2;
 
     // Definizione del percorso SVG come stringa
     const pathData = `
@@ -68,11 +101,21 @@ export default function MinigameGolf() {
 
     //Sottoscrizione e rimozione del listener al giroscopio
     useEffect(() => {
-        setSubscription(
-            Gyroscope.addListener(data => {
-                setGyroData(data);
-            })
-        );
+        const init = async () => {
+            await calibrateGyroscope();
+            setSubscription(
+                Gyroscope.addListener(data => {
+                    // Rimuove il bias dalla lettura
+                    setGyroData({
+                        x: data.x - gyroBias.x,
+                        y: data.y - gyroBias.y,
+                        z: data.z
+                    });
+                })
+            );
+        };
+        init();
+    
         return () => {
             subscription?.remove();
             setSubscription(null);
@@ -80,7 +123,7 @@ export default function MinigameGolf() {
     }, []);
 
     // Verifica se la pallina è vicina a uno dei punti che simulano la curva
-    function isBallNearPath(ballX: number, ballY: number, tolerance = 30) {
+    function isBallNearPath(ballX: number, ballY: number, tolerance = 40) {
         return curvedPathPoints.some(({ x, y }) => {
             const dx = ballX - x;
             const dy = ballY - y;
@@ -151,7 +194,8 @@ export default function MinigameGolf() {
     }, [x, y, hasWon, hasLost]);
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { alignItems: 'center' }]} >
+
 
             {/* Punti di controllo visibili */}
             {curvedPathPoints.map((point, index) => (
@@ -189,16 +233,15 @@ export default function MinigameGolf() {
             <View style={[styles.ball, { top: ballPosition.top, left: ballPosition.left }]} />
 
             {/* Messaggi */}
-            {hasWon && (
-                <View style={styles.message}>
-                    <Text style={styles.winText}>🏆 Hai vinto!</Text>
-                </View>
-            )}
-            {hasLost && (
-                <View style={styles.message}>
-                    <Text style={[styles.winText, { color: 'red' }]}>💀 Hai perso!</Text>
-                </View>
-            )}
+            {(hasWon || hasLost || isCalibrating) && (
+        <View style={styles.overlay}>
+            <View style={styles.messageBox}>
+            {hasWon && <Text style={styles.winText}>🏆 Hai vinto!</Text>}
+            {hasLost && <Text style={[styles.winText, { color: 'red' }]}>💀 Hai perso!</Text>}
+            {isCalibrating && <Text style={[styles.winText, { color: 'orange' }]}>⏳ Calibrazione...</Text>}
+            </View>
+        </View>
+        )}
         </View>
     );
 }
@@ -236,4 +279,26 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: 'green',
     },
+    overlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.6)', // sfondo scuro semitrasparente
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 100,
+      },
+      messageBox: {
+        backgroundColor: 'white',
+        padding: 20,
+        borderRadius: 10,
+        elevation: 5,
+        width: '60%',           // OCCUPA l' x% della larghezza dello schermo
+        maxWidth: 300,          // Limita la larghezza massima
+        alignItems: 'center',
+        justifyContent: 'center',
+      },
+      
 });
