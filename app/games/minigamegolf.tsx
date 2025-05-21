@@ -12,36 +12,106 @@ export default function MinigameGolf() {
     //stato del giroscopio
     const [{ x, y }, setGyroData] = useState({ x: 0, y: 0, z: 0 });
 
+    const maxY = SCREEN_HEIGHT - 100; // margine per buca e UI
+
     //spostamento orizzontale per centrare il percorso
     const pathOffsetX = SCREEN_WIDTH / 2 - 75;
 
-    // Definizione del percorso SVG come stringa
+    // Definizione del percorso SVG come stringa 
     const pathData = `
-      M${pathOffsetX},100 
-      Q${pathOffsetX + 100},150 ${pathOffsetX},200 
-      T${pathOffsetX},300 
-      T${pathOffsetX},400 
-      T${pathOffsetX},500
+        M${pathOffsetX},50 
+        H${pathOffsetX + 100}
+        C${pathOffsetX + 200},50 ${pathOffsetX + 200},200 ${pathOffsetX + 100},200
+        H${pathOffsetX - 50}
+        C${pathOffsetX - 100 },200 ${pathOffsetX - 50 },400 ${pathOffsetX},400
+        C${pathOffsetX},400 ${pathOffsetX + 100},400 ${pathOffsetX + 100},350
+        C${pathOffsetX + 100},300 ${pathOffsetX + 300},350 ${pathOffsetX + 200},600
+        C${pathOffsetX + 200},600 ${pathOffsetX -50 },600 ${pathOffsetX - 50},650
     `;
+
+
 
     // Punti di controllo che approssimano la curva
     const curvedPathPoints = [
-        { x: pathOffsetX, y: 100 },
-        { x: pathOffsetX + 10, y: 125 },
-        { x: pathOffsetX + 50, y: 125 },
-        { x: pathOffsetX, y: 200 },
-        { x: pathOffsetX - 50, y: 250 },
-        { x: pathOffsetX, y: 300 },
-        { x: pathOffsetX + 50, y: 350 },
-        { x: pathOffsetX, y: 400 },
-        { x: pathOffsetX - 50, y: 450 },
-        { x: pathOffsetX, y: 500 },
+        { x: pathOffsetX, y: 50 },
+        { x: pathOffsetX + 25, y: 50 },
+        { x: pathOffsetX + 50, y: 50 },
+        { x: pathOffsetX + 75, y: 50 },
+        { x: pathOffsetX + 100, y: 50 },
+        { x: pathOffsetX + 125, y: 55 },
+        { x: pathOffsetX + 140, y: 60 },
+        { x: pathOffsetX + 150, y: 70 },
+        { x: pathOffsetX + 165, y: 80 },
+        { x: pathOffsetX + 175, y: 95 },
+        { x: pathOffsetX + 175, y: 110 },
+        { x: pathOffsetX + 175, y: 120 },
+        { x: pathOffsetX + 175, y: 135 },
+        { x: pathOffsetX + 175, y: 150 },
+        { x: pathOffsetX + 165, y: 165 },
+        { x: pathOffsetX + 150, y: 180 },
+        { x: pathOffsetX + 135, y: 190 },
+        { x: pathOffsetX + 125, y: 200 },
+        { x: pathOffsetX + 100, y: 200 },
+        { x: pathOffsetX + 75, y: 200 },
+        { x: pathOffsetX + 50, y: 200 },
+        { x: pathOffsetX + 25, y: 200 },
+        { x: pathOffsetX + 0, y: 200 },
+        { x: pathOffsetX - 25, y: 200 },
+        { x: pathOffsetX - 50, y: 200 },
+        { x: pathOffsetX - 65, y: 220 },
+        { x: pathOffsetX - 70, y: 240 },
+        { x: pathOffsetX - 70, y: 260 },
+        { x: pathOffsetX - 65, y: 280 },
+        { x: pathOffsetX - 60, y: 300 },
+        { x: pathOffsetX - 60, y: 320 },
+        { x: pathOffsetX - 50, y: 340 },
+        { x: pathOffsetX - 40, y: 360 },
+        { x: pathOffsetX - 30, y: 380 },
+        { x: pathOffsetX - 20, y: 395 },
+        { x: pathOffsetX - 0, y: 395 },
+        { x: pathOffsetX + 20, y: 395 },
+        { x: pathOffsetX + 40, y: 395 },
+        { x: pathOffsetX + 60, y: 390 },
+        { x: pathOffsetX + 80, y: 380 },
+        { x: pathOffsetX + 95, y: 360 },
+        { x: pathOffsetX + 115, y: 340 },
+        { x: pathOffsetX + 130, y: 335 },
+        { x: pathOffsetX + 150, y: 340 },
+        { x: pathOffsetX + 170, y: 355 },
+        { x: pathOffsetX + 190, y: 370 },
+        { x: pathOffsetX + 210, y: 390 },
+        { x: pathOffsetX + 220, y: 410 },
+        { x: pathOffsetX + 225, y: 430 },
+        { x: pathOffsetX + 225, y: 450 },
+        { x: pathOffsetX + 225, y: 470 },
+        { x: pathOffsetX + 225, y: 490 },
+        { x: pathOffsetX + 225, y: 510 },
+        { x: pathOffsetX + 220, y: 530 },
+        { x: pathOffsetX + 215, y: 550 },
+        { x: pathOffsetX + 210, y: 570 },
+        { x: pathOffsetX + 205, y: 590 },
+        { x: pathOffsetX + 200, y: 600 },
+        { x: pathOffsetX + 180, y: 600 },
+        { x: pathOffsetX + 160, y: 600 },
+        { x: pathOffsetX + 140, y: 605 },
+        { x: pathOffsetX + 120, y: 605 },
+        { x: pathOffsetX + 100, y: 605 },
+        { x: pathOffsetX + 80, y: 610 },
+        { x: pathOffsetX + 60, y: 610 },
+        { x: pathOffsetX + 40, y: 615 },
+        { x: pathOffsetX + 20, y: 615 },
+        { x: pathOffsetX + 0, y: 615 },
+        { x: pathOffsetX - 20, y: 620 },
+        { x: pathOffsetX - 40, y: 630 },
+
+
     ];
+
 
     //stato della pallina
     const [ballPosition, setBallPosition] = useState({
-        top: 100,
-        left: pathOffsetX - 12.5, // spawn centrato
+        top: 50,
+        left: pathOffsetX - 12.5,
     });
 
     //useRef é un hook che permette di refenziare un valore NON NECESSARIO PER IL RENDERING
@@ -59,11 +129,10 @@ export default function MinigameGolf() {
 
     //posizione della buca
     const holePosition = {
-        top: 500,
-        left: pathOffsetX,
+        top: y + 650,
+        left: pathOffsetX - 50,
         radius: 25,
     };
-
     Gyroscope.setUpdateInterval(50); // 50ms (20 Hz)
 
     //Sottoscrizione e rimozione del listener al giroscopio
@@ -80,7 +149,7 @@ export default function MinigameGolf() {
     }, []);
 
     // Verifica se la pallina è vicina a uno dei punti che simulano la curva
-    function isBallNearPath(ballX: number, ballY: number, tolerance = 30) {
+    function isBallNearPath(ballX: number, ballY: number, tolerance = 20) {
         return curvedPathPoints.some(({ x, y }) => {
             const dx = ballX - x;
             const dy = ballY - y;
