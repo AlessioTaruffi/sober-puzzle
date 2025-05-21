@@ -1,152 +1,173 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { router } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import {
-    Alert,
-    Animated,
-    Button,
-    Dimensions,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
+  Alert,
+  Animated,
+  Dimensions,
+  ImageBackground,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native';
 
-const { width: screenWidth } = Dimensions.get('window');
-const PASSER_WIDTH = 40;
-const PASSER_SPACING = 15;
-const PASSER_SPEED = 4000; // ms per passante
+const { width, height } = Dimensions.get('window');
+const TOTAL_PASSERS = 10;
 
-type PasserType = 'target' | 'other';
+const GAME_AREA_WIDTH = width * 0.9;
+const GAME_AREA_HEIGHT = height * 0.8;
 
-interface Passer {
+const images = {
+  beer: require('../../assets/images/beer.png'),
+  water: require('../../assets/images/water.png'),
+};
+
+type Passer = {
   id: number;
-  type: PasserType;
-  animation: Animated.Value;
-}
+  type: 'beer' | 'water';
+  x: Animated.Value;
+  y: Animated.Value;
+};
 
 export default function MinigameConta() {
-  const totalPassers = 20;
+
   const [passers, setPassers] = useState<Passer[]>([]);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [showInput, setShowInput] = useState(false);
-  const [userCount, setUserCount] = useState('');
-  const targetCountRef = useRef(0);
-  const passersPassed = useRef(0);
-
-  useEffect(() => {
-    if (isPlaying) {
-      startGame();
-    } else {
-      resetGame();
-    }
-  }, [isPlaying]);
-
-  const startGame = () => {
-    passersPassed.current = 0;
-    targetCountRef.current = 0;
-    setShowInput(false);
-    setUserCount('');
-    // genera passanti
-    const newPassers: Passer[] = [];
-    for (let i = 0; i < totalPassers; i++) {
-      const type: PasserType = Math.random() < 0.3 ? 'target' : 'other';
-      if (type === 'target') targetCountRef.current++;
-      newPassers.push({
-        id: i,
-        type,
-        animation: new Animated.Value(screenWidth + i * (PASSER_WIDTH + PASSER_SPACING)),
-      });
-    }
-    setPassers(newPassers);
-
-    // anima ogni passante in sequenza
-    newPassers.forEach((passer, index) => {
-      Animated.timing(passer.animation, {
-        toValue: -PASSER_WIDTH,
-        duration: PASSER_SPEED,
-        delay: index * (PASSER_SPEED / 3),
-        useNativeDriver: true,
-      }).start(() => {
-        passersPassed.current++;
-        if (passersPassed.current === totalPassers) {
-          setShowInput(true);
-        }
-      });
-    });
-  };
+  const [gameOver, setGameOver] = useState(false);
+  const [correctBeerCount, setCorrectBeerCount] = useState(0);
+  const [userInput, setUserInput] = useState('');
+  const [gameAreaLayout, setGameAreaLayout] = useState({ x: 0, y: 0 });  
+  const [isReady, setIsReady] = useState(false);
+  const [navigating, setNavigating] = useState(false);
 
   const resetGame = () => {
+    setIsReady(false);
     setPassers([]);
-    setShowInput(false);
-    setUserCount('');
-    targetCountRef.current = 0;
-    passersPassed.current = 0;
+    setUserInput('');
+    setCorrectBeerCount(0);
+    setGameOver(false);
   };
 
-  const checkResult = () => {
-    const guess = parseInt(userCount, 10);
-    if (isNaN(guess)) {
-      Alert.alert('Errore', 'Inserisci un numero valido');
+  useEffect(() => {
+    if (gameOver) return;
+
+    const newPassers: Passer[] = Array.from({ length: TOTAL_PASSERS }, (_, i) => {
+      const type = Math.random() < 0.4 ? 'beer' : 'water';
+      const x = new Animated.Value(Math.random() * (GAME_AREA_WIDTH - 40));
+      const y = new Animated.Value(Math.random() * (GAME_AREA_HEIGHT - 40));
+      animateMovement(x, y);
+      return { id: i, type, x, y };
+    });
+
+    setPassers(newPassers);
+    setCorrectBeerCount(newPassers.filter(p => p.type === 'beer').length);
+    setIsReady(true);
+
+    const timer = setTimeout(() => {
+      setGameOver(true);
+    }, 6000);
+
+    return () => clearTimeout(timer);
+  }, [gameOver]);
+
+  const animateMovement = (x: Animated.Value, y: Animated.Value) => {
+    const move = () => {
+      Animated.parallel([
+        Animated.timing(x, {
+          toValue: Math.random() * (GAME_AREA_WIDTH - 40),
+          duration: 1000 + Math.random() * 2000,
+          useNativeDriver: false,
+        }),
+        Animated.timing(y, {
+          toValue: Math.random() * (GAME_AREA_HEIGHT - 40),
+          duration: 1000 + Math.random() * 2000,
+          useNativeDriver: false,
+        }),
+      ]).start(() => move());
+    };
+    move();
+  };
+
+  const handleSubmit = () => {
+    const userGuess = parseInt(userInput, 10);
+    if (isNaN(userGuess)) {
+      Alert.alert('Error', 'Please insert a valid number.');
       return;
     }
-    if (guess === targetCountRef.current) {
-      Alert.alert('Bravo!', 'Hai contato correttamente!', [
-        { text: 'OK', onPress: () => setIsPlaying(false) },
-      ]);
-    } else {
-      Alert.alert(
-        'Ops!',
-        `Hai contato ${guess}, ma erano ${targetCountRef.current}.`,
-        [{ text: 'Riprova', onPress: () => setIsPlaying(false) }]
-      );
-    }
+
+    const isCorrect = userGuess === correctBeerCount;
+
+    Alert.alert(
+      isCorrect ? 'Correct!' : 'Wrong',
+      isCorrect
+        ? 'You maybe deserve one 🎉'
+        : 'Better stop drinking Mate!',
+      [
+        {
+          text: 'OK',
+          onPress: () => {
+            setNavigating(true);
+            resetGame();
+            
+            // Ritornare alla schermata precedente
+            setTimeout(() => {
+              router.back(); // Questo fa tornare indietro
+            }, 500);
+          },
+        },
+      ]
+    );
   };
+
+  if (!isReady || gameOver || navigating) {
+    return (
+      <View style={styles.container}>
+        {gameOver ? (
+          <>
+            <Text style={styles.title}>How many beers have you seen?</Text>
+            <TextInput
+              style={styles.input}
+              value={userInput}
+              onChangeText={setUserInput}
+              keyboardType="numeric"
+              placeholder="Insert a number"
+            />
+            <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+              <Text style={styles.buttonText}>Check</Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <Text>Loading...</Text>
+        )}
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Conta i passanti</Text>
-
-      {isPlaying ? (
-        <>
-          <View style={styles.passersArea}>
-            {passers.map((passer) => (
-              <Animated.View
-                key={passer.id}
-                style={[
-                  styles.passer,
-                  passer.type === 'target' ? styles.targetPasser : styles.otherPasser,
-                  {
-                    transform: [{ translateX: passer.animation }],
-                  },
-                ]}
-              >
-                <Text style={styles.passerText}>
-                  {passer.type === 'target' ? '🚶‍♂️' : '🚶‍♀️'}
-                </Text>
-              </Animated.View>
-            ))}
-          </View>
-
-          {showInput ? (
-            <>
-              <Text style={styles.prompt}>
-                Quanti passanti <Text style={{ fontWeight: 'bold' }}>speciali</Text> hai contato?
-              </Text>
-              <TextInput
-                style={styles.input}
-                keyboardType="numeric"
-                value={userCount}
-                onChangeText={setUserCount}
-                placeholder="Inserisci un numero"
-              />
-              <Button title="Verifica" onPress={checkResult} />
-            </>
-          ) : (
-            <Text style={styles.waitText}>Passanti in arrivo...</Text>
-          )}
-        </>
-      ) : (
-        <Button title="Inizia Gioco" onPress={() => setIsPlaying(true)} />
-      )}
+      <ImageBackground
+        source={require('../../assets/images/bar.jpg')}
+        style={styles.gameArea}
+        imageStyle={{ borderRadius: 12 }}
+        onLayout={(event) => {
+          const { x, y } = event.nativeEvent.layout;
+          setGameAreaLayout({ x, y });
+        }}
+      >
+        {passers.map(passer => (
+          <Animated.Image
+            key={passer.id}
+            source={images[passer.type]}
+            style={[
+              styles.passer,
+              {
+                left: passer.x,
+                top: passer.y,
+              },
+            ]}
+          />
+        ))}
+      </ImageBackground>
     </View>
   );
 }
@@ -154,55 +175,53 @@ export default function MinigameConta() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#dff',
     justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
-  title: {
-    fontSize: 28,
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  passersArea: {
-    height: 80,
+  gameArea: {
+    width: GAME_AREA_WIDTH,
+    height: GAME_AREA_HEIGHT,
+    backgroundColor: '#ffffffaa',
+    borderColor: '#007AFF',
+    borderWidth: 2,
+    borderRadius: 12,
     overflow: 'hidden',
-    marginBottom: 20,
+    position: 'relative',
+    justifyContent: 'center',
+    alignSelf: 'center',
   },
   passer: {
     position: 'absolute',
-    width: PASSER_WIDTH,
-    height: 70,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 10,
+    width: 40,
+    height: 40,
   },
-  targetPasser: {
-    backgroundColor: '#4caf50',
-  },
-  otherPasser: {
-    backgroundColor: '#ddd',
-  },
-  passerText: {
-    fontSize: 32,
-  },
-  prompt: {
-    fontSize: 20,
+  title: {
+    fontSize: 24,
+    fontWeight: '600',
+    marginBottom: 20,
     textAlign: 'center',
-    marginBottom: 10,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#888',
-    borderRadius: 6,
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    fontSize: 18,
-    marginBottom: 15,
+    borderColor: '#aaa',
+    padding: 10,
+    borderRadius: 8,
+    width: '60%',
     textAlign: 'center',
+    fontSize: 18,
+    marginBottom: 20,
+    backgroundColor: '#fff',
   },
-  waitText: {
-    textAlign: 'center',
+  button: {
+    backgroundColor: '#007AFF',
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 8,
+  },
+  buttonText: {
+    color: '#fff',
     fontSize: 18,
-    fontStyle: 'italic',
   },
 });
