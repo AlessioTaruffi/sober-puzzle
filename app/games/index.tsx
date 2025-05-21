@@ -24,6 +24,12 @@ export default function GamesHome() {
           <Text style={styles.buttonText}>Minigioco golf</Text>
         </Pressable>
       </Link>
+
+      <Link href="/games/minigamememo" asChild>
+        <Pressable style={styles.button}>
+          <Text style={styles.buttonText}>Minigioco memo</Text>
+        </Pressable>
+      </Link>
     </View>
   );
 }
