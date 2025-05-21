@@ -48,7 +48,7 @@ export default function MinigameGolf() {
     const maxY = SCREEN_HEIGHT - 100; // margine per buca e UI
 
     //spostamento orizzontale per centrare il percorso
-    const pathOffsetX = SCREEN_WIDTH / 2;
+    const pathOffsetX = SCREEN_WIDTH / 3;
 
     // Definizione del percorso SVG come stringa 
     const pathData = `
