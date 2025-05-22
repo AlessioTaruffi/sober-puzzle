@@ -2,11 +2,11 @@ import { StyleSheet, Text, View } from "react-native";
 
 import React, { useEffect, useRef, useState } from 'react';
 import {
-    Alert,
-    Dimensions,
-    Platform,
-    TouchableOpacity,
-    Vibration,
+  Alert,
+  Dimensions,
+  Platform,
+  TouchableOpacity,
+  Vibration,
 } from 'react-native';
 
 const COLORS = ['red', 'blue', 'green', 'yellow', 'purple', 'orange'];
@@ -22,8 +22,8 @@ export default function minigame1() {
     const [_, setForceUpdate] = useState(0);
     const resultsRef = useRef<{ time: number; correct: boolean }[]>([]);
   
-    const intervalRef = useRef<NodeJS.Timeout | null>(null);
-    const colorTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+    const colorTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   
     useEffect(() => {
       startTimer();
