@@ -39,6 +39,36 @@ const GameScreen = () => {
     const [isShowing, setIsShowing] = useState(true);
     const [forceReset, setForceReset] = useState(0);
 
+    const [timeLeft, setTimeLeft] = useState(20); //tempo limite in secondi
+    const [maxRound, setMaxRound] = useState(1); //tracker del numero massimo di round raggiunto
+
+
+    //effetto per il countdown globale
+    //viene eseguito ogni secondo e decrementa il tempo rimasto
+    //allo scadere del tempo rilascia un alert e dá l'opzione di ricominciare
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setTimeLeft((prev) => {
+                if (prev <= 1) {
+                    clearInterval(timer);
+                    Alert.alert('Tempo scaduto', `Round massimo: ${Math.max(maxRound, round)}`, [
+                        { text: 'Ricomincia', onPress: () => {
+                            setRound(1);
+                            setMaxRound(1);
+                            setTimeLeft(60);
+                            setForceReset((prev) => prev + 1);
+                        }},
+                    ]);
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+
+        return () => clearInterval(timer); //cleanup su unmount
+    }, []);
+
+
     //effetto che viene eseguito quando il componente viene montato o quando il round cambia
     useEffect(() => {
         startNewRound();
@@ -120,6 +150,7 @@ const GameScreen = () => {
         });
 
         if (success) {
+            setMaxRound((prev) => Math.max(prev, round)); // usa round attuale //aggiorna il numero massimo di round se necessario
             setTimeout(() => {
                 Alert.alert('Daje così', 'Tutte giuste', [
                     { text: 'Avanti', onPress: () => setRound((r) => r + 1) },
@@ -154,6 +185,7 @@ const GameScreen = () => {
 
     return (
         <View style={styles.container}>
+            <Text style={styles.timerText}>Tempo rimasto: {timeLeft}s</Text>
             <Text style={styles.roundText}>Round {round}</Text>
             <View style={styles.grid}>
                 {cards.map((card, index) => (
@@ -189,6 +221,12 @@ const generateRandomIndices = (total: number, count: number): number[] => {
     };
 
 const styles = StyleSheet.create({
+    timerText: {
+        fontSize: 18,
+        textAlign: 'center',
+        marginBottom: 10,
+        color: 'red',
+    },
     container: {
         flex: 1,
         padding: 20,
