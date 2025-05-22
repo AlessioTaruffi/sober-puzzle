@@ -46,27 +46,33 @@ const GameScreen = () => {
     //effetto per il countdown globale
     //viene eseguito ogni secondo e decrementa il tempo rimasto
     //allo scadere del tempo rilascia un alert e dá l'opzione di ricominciare
+    //2 useeffect diversi in quanto il primo serve per il countdown e il secondo per l'alert
+    //se non fosse cosí il round massimo non verrebbe aggiornato
     useEffect(() => {
         const timer = setInterval(() => {
-            setTimeLeft((prev) => {
-                if (prev <= 1) {
-                    clearInterval(timer);
-                    Alert.alert('Tempo scaduto', `Round massimo: ${Math.max(maxRound, round)}`, [
-                        { text: 'Ricomincia', onPress: () => {
-                            setRound(1);
-                            setMaxRound(1);
-                            setTimeLeft(60);
-                            setForceReset((prev) => prev + 1);
-                        }},
-                    ]);
-                    return 0;
-                }
-                return prev - 1;
-            });
+            setTimeLeft(prev => Math.max(prev - 1, 0));
         }, 1000);
-
-        return () => clearInterval(timer); //cleanup su unmount
+        return () => clearInterval(timer);
     }, []);
+
+    // 2) alert quando timeLeft arriva a zero
+    useEffect(() => {
+        if (timeLeft === 0) {
+            Alert.alert(
+            'Tempo scaduto',
+            `Round massimo: ${maxRound}`,
+            [{
+                text: 'Ricomincia',
+                onPress: () => {
+                setRound(1);
+                setMaxRound(1);
+                setTimeLeft(60);
+                setForceReset(prev => prev + 1);
+                }
+            }]
+            );
+        }
+    }, [timeLeft, maxRound]);
 
 
     //effetto che viene eseguito quando il componente viene montato o quando il round cambia
@@ -150,7 +156,7 @@ const GameScreen = () => {
         });
 
         if (success) {
-            setMaxRound((prev) => Math.max(prev, round)); // usa round attuale //aggiorna il numero massimo di round se necessario
+            setMaxRound((prev) => Math.max(prev, round)); //aggiorna il numero massimo di round se necessario
             setTimeout(() => {
                 Alert.alert('Daje così', 'Tutte giuste', [
                     { text: 'Avanti', onPress: () => setRound((r) => r + 1) },
