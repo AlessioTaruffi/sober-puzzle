@@ -1,3 +1,4 @@
+import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
@@ -7,7 +8,6 @@ import {
   ImageBackground,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View
 } from 'react-native';
@@ -65,7 +65,7 @@ export default function MinigameConta() {
 
     const timer = setTimeout(() => {
       setGameOver(true);
-    }, 6000);
+    },  2500);
 
     return () => clearTimeout(timer);
   }, [gameOver]);
@@ -120,28 +120,32 @@ export default function MinigameConta() {
   };
 
   if (!isReady || gameOver || navigating) {
-    return (
-      <View style={styles.container}>
-        {gameOver ? (
-          <>
-            <Text style={styles.title}>How many beers have you seen?</Text>
-            <TextInput
-              style={styles.input}
-              value={userInput}
-              onChangeText={setUserInput}
-              keyboardType="numeric"
-              placeholder="Insert a number"
-            />
-            <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-              <Text style={styles.buttonText}>Check</Text>
-            </TouchableOpacity>
-          </>
-        ) : (
-          <Text>Loading...</Text>
-        )}
-      </View>
-    );
-  }
+     return (
+    <View style={styles.container}>
+      {gameOver ? (
+        <>
+          <Text style={styles.title}>Tap once for each beer you saw</Text>
+          <TouchableOpacity
+            style={styles.tapArea}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+              setUserInput(prev => String(Number(prev) + 1));
+            }}
+          >
+            <Text style={styles.tapText}>Tap Count: {userInput || 0}</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+            <Text style={styles.buttonText}>Check</Text>
+          </TouchableOpacity>
+        </>
+      ) : (
+        <Text>Loading...</Text>
+      )}
+    </View>
+  );
+}
+  
 
   return (
     <View style={styles.container}>
@@ -224,4 +228,20 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
   },
+  tapArea: {
+  width: '100%',
+  height: 200,
+  backgroundColor: '#eef',
+  borderRadius: 12,
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginBottom: 20,
+  borderWidth: 1,
+  borderColor: '#888',
+},
+tapText: {
+  fontSize: 28,
+  fontWeight: 'bold',
+},
+
 });
