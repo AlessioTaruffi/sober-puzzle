@@ -36,6 +36,11 @@ export default function GamesHome() {
           <Text style={styles.buttonText}>Minigioco Shot</Text>
         </Pressable>
       </Link>
+            <Link href="/games/minigameLigth" asChild>
+        <Pressable style={styles.button}>
+          <Text style={styles.buttonText}>Minigioco Light</Text>
+        </Pressable>
+      </Link>
 
       <Link href="/games/minigameConta" asChild>
         <Pressable style={styles.button}>

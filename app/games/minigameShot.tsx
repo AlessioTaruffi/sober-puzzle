@@ -1,55 +1,67 @@
 import { CameraType, CameraView, useCameraPermissions } from 'expo-camera';
 import { Accelerometer } from 'expo-sensors';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Animated, Button, Dimensions, StyleSheet, Text, View } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
+
+
+// IL MIRINO NON RIESCE AD ANDARE SOTTO AL CENTRO INIZIALE 
+// VORREI PIU' UNA COSA COME VR CHE COM'E' ORA
+const GAME_AREA_HEIGHT = height * 0.9;
 const CROSSHAIR_SIZE = 50;
 const TARGET_RADIUS = 5;
 const HIT_TOLERANCE = 20;
+const BOTTOM_MARGIN = 20;
 
-const SCALE_FACTOR_X = width * 3; 
-const SCALE_FACTOR_Y = height * 3; 
+const SCALE_FACTOR_X = width * 3;
+const SCALE_FACTOR_Y = GAME_AREA_HEIGHT * 3;
 
 export default function App() {
   const [facing, setFacing] = useState<CameraType>('back');
   const [permission, requestPermission] = useCameraPermissions();
   const [position, setPosition] = useState(
-    new Animated.ValueXY({ x: width / 2 - CROSSHAIR_SIZE / 2, y: height / 2 - CROSSHAIR_SIZE / 2 })
+    new Animated.ValueXY({ x: width / 2 - CROSSHAIR_SIZE / 2, y: GAME_AREA_HEIGHT / 2 - CROSSHAIR_SIZE / 2 })
   );
   const [targetReached, setTargetReached] = useState(false);
   const [targetPosition, setTargetPosition] = useState(getRandomTargetPosition());
 
+  const initialTilt = useRef<{ x: number | null; y: number | null }>({ x: null, y: null });
+
   useEffect(() => {
     Accelerometer.setUpdateInterval(16);
 
-    const subscription = Accelerometer.addListener(({ x, y }) => {
-      const deltaX = x;
-      const deltaY = y;
+const subscription = Accelerometer.addListener(({ x, y }) => {
+  if (initialTilt.current.x === null || initialTilt.current.y === null) {
+    initialTilt.current = { x, y };
+  }
 
-      const rawX = width / 2 + deltaX * SCALE_FACTOR_X;
-      const rawY = height / 2 + deltaY * SCALE_FACTOR_Y;
+  const offsetX = x - (initialTilt.current.x ?? 0);
+  const offsetY = y - (initialTilt.current.y ?? 0);
 
-      const newX = clamp(rawX - CROSSHAIR_SIZE / 2, 0, width - CROSSHAIR_SIZE);
-      const newY = clamp(rawY - CROSSHAIR_SIZE / 2, 0, height - CROSSHAIR_SIZE);
+  const rawX = width / 2 + offsetX * SCALE_FACTOR_X - CROSSHAIR_SIZE / 2;
+  const rawY = GAME_AREA_HEIGHT / 2 + offsetY * SCALE_FACTOR_Y - CROSSHAIR_SIZE / 2;
 
-      Animated.timing(position, {
-        toValue: { x: newX, y: newY },
-        useNativeDriver: false,
-        duration: 100,
-      }).start();
+  const newX = clamp(rawX, 0, width - CROSSHAIR_SIZE);
+  const newY = clamp(rawY, 0, GAME_AREA_HEIGHT - CROSSHAIR_SIZE); // <-- aggiornato qui
 
-      const centerX = newX + CROSSHAIR_SIZE / 2;
-      const centerY = newY + CROSSHAIR_SIZE / 2;
+  Animated.timing(position, {
+    toValue: { x: newX, y: newY },
+    useNativeDriver: false,
+    duration: 100,
+  }).start();
 
-      const dx = centerX - (targetPosition.x + TARGET_RADIUS);
-      const dy = centerY - (targetPosition.y + TARGET_RADIUS);
-      const distance = Math.sqrt(dx * dx + dy * dy);
+  const centerX = newX + CROSSHAIR_SIZE / 2;
+  const centerY = newY + CROSSHAIR_SIZE / 2;
 
-      if (!targetReached && distance < HIT_TOLERANCE) {
-        setTargetReached(true);
-      }
-    });
+  const dx = centerX - (targetPosition.x + TARGET_RADIUS);
+  const dy = centerY - (targetPosition.y + TARGET_RADIUS);
+  const distance = Math.sqrt(dx * dx + dy * dy);
+
+  if (!targetReached && distance < HIT_TOLERANCE) {
+    setTargetReached(true);
+  }
+});
 
 
     return () => subscription && subscription.remove();
@@ -80,35 +92,36 @@ export default function App() {
     <View style={styles.container}>
       <CameraView style={styles.camera} facing={facing} />
 
-      {/* Target rosso */}
-      {!targetReached && (
-        <View
+      <View style={styles.gameArea}>
+        {!targetReached && (
+          <View
+            style={[
+              styles.fixedPoint,
+              {
+                top: targetPosition.y,
+                left: targetPosition.x,
+              },
+            ]}
+          />
+        )}
+
+        <Animated.View
           style={[
-            styles.fixedPoint,
-            {
-              top: targetPosition.y,
-              left: targetPosition.x,
-            },
+            styles.crosshair,
+            position.getLayout(),
+            { borderColor: targetReached ? 'lime' : 'white' },
           ]}
         />
-      )}
-
-      {/* Mirino */}
-      <Animated.View
-        style={[
-          styles.crosshair,
-          position.getLayout(),
-          { borderColor: targetReached ? 'lime' : 'white' },
-        ]}
-      />
+      </View>
     </View>
   );
 }
 
 function getRandomTargetPosition() {
   const margin = CROSSHAIR_SIZE / 2 + TARGET_RADIUS + HIT_TOLERANCE;
+  const bottomMargin = BOTTOM_MARGIN;
   const x = clamp(Math.random() * width, margin, width - margin);
-  const y = clamp(Math.random() * height, margin, height - margin);
+  const y = clamp(Math.random() * GAME_AREA_HEIGHT, margin, GAME_AREA_HEIGHT - margin - bottomMargin);
   return { x, y };
 }
 
@@ -127,6 +140,15 @@ const styles = StyleSheet.create({
   },
   camera: {
     flex: 1,
+  },
+  gameArea: {
+    position: 'absolute',
+    top: 0,
+    width: width,
+    height: GAME_AREA_HEIGHT,
+    zIndex: 10,
+    bottom:
+    0,
   },
   fixedPoint: {
     position: 'absolute',
