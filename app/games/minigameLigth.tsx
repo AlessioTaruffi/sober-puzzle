@@ -30,16 +30,13 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <CameraView style={styles.camera} facing={facing} enableTorch={torchEnabled}>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
-            <Text style={styles.text}>Flip Camera</Text>
-          </TouchableOpacity>
+      <CameraView  style={{ width: 0, height: 0, opacity: 0 }} facing="back" enableTorch={torchEnabled}>
+      </CameraView>
+              <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.button} onPress={toggleTorch}>
             <Text style={styles.text}>{torchEnabled ? 'Turn Flash Off' : 'Turn Flash On'}</Text>
           </TouchableOpacity>
         </View>
-      </CameraView>
     </View>
   );
 }
@@ -71,6 +68,6 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: 'white',
+    color: 'black',
   },
 });
