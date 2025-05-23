@@ -8,26 +8,42 @@ import {
   Button,
   Alert,
 } from 'react-native';
+import { Accelerometer } from 'expo-sensors';
 
 export default function App() {
   const [facing, setFacing] = useState<CameraType>('back');
   const [permission, requestPermission] = useCameraPermissions();
   const [torchEnabled, setTorchEnabled] = useState(false);
   const [timer, setTimer] = useState(20);
+
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const torchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const torchStartTime = useRef<number | null>(null);
+  const reactionTimes = useRef<number[]>([]);
+  const [subscription, setSubscription] = useState<any>(null);
+
+  const torchEnabledRef = useRef(false); // NEW
 
   useEffect(() => {
-    if (!permission?.granted) return;
+    torchEnabledRef.current = torchEnabled;
+  }, [torchEnabled]);
 
+  // Timer principale
+  useEffect(() => {
+    if (!permission?.granted) return;
     startTimer();
+    setupShakeDetection();
 
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
+      if (torchTimeout.current) clearTimeout(torchTimeout.current);
+      subscription?.remove();
     };
   }, [permission]);
 
   const startTimer = () => {
-    setTimer(20); // reset timer
+    setTimer(20);
     if (intervalRef.current) clearInterval(intervalRef.current);
 
     intervalRef.current = setInterval(() => {
@@ -40,18 +56,74 @@ export default function App() {
         return prev - 1;
       });
     }, 1000);
+
+    triggerTorchRandomly();
+  };
+
+  const triggerTorchRandomly = () => {
+    const delay = Math.random() * 5000;
+    torchTimeout.current = setTimeout(() => {
+      torchStartTime.current = Date.now();
+      setTorchEnabled(true);
+    }, delay);
+  };
+
+  const setupShakeDetection = () => {
+    Accelerometer.setUpdateInterval(100);
+    const sub = Accelerometer.addListener(accelerometerData => {
+      const { x, y, z } = accelerometerData;
+      const total = Math.abs(x) + Math.abs(y) + Math.abs(z);
+      if (total > 2 && torchEnabledRef.current) {
+        handleShakeDetected();
+      }
+    });
+    setSubscription(sub);
+  };
+
+  const handleShakeDetected = () => {
+    setTorchEnabled(false);
+    torchEnabledRef.current = false;
+
+    if (torchStartTime.current) {
+      const reaction = Date.now() - torchStartTime.current;
+      reactionTimes.current.push(reaction);
+      torchStartTime.current = null;
+      triggerTorchRandomly();
+    }
   };
 
   const handleEndTimer = () => {
-    Alert.alert('⏰ Tempo scaduto!', 'Il conto alla rovescia è terminato.');
-    setTorchEnabled(false);
+  if (torchTimeout.current) {
+    clearTimeout(torchTimeout.current); // ✅ Cancella eventuale attivazione futura
+    torchTimeout.current = null;
+  }
+
+  setTorchEnabled(false);
+  torchEnabledRef.current = false;
+
+  subscription?.remove();
+
+  const media = reactionTimes.current.length
+    ? (reactionTimes.current.reduce((a, b) => a + b) / reactionTimes.current.length).toFixed(0)
+    : 'N/A';
+
+  Alert.alert(
+    '⏰ Tempo scaduto!',
+    `Media tempi di reazione: ${media === 'N/A' ? media : media + ' ms'}`
+  );
   };
 
+
   const toggleTorch = () => {
-    setTorchEnabled(prev => !prev);
+    setTorchEnabled(prev => {
+      const newValue = !prev;
+      torchEnabledRef.current = newValue;
+      return newValue;
+    });
   };
 
   const restartTimer = () => {
+    reactionTimes.current = [];
     startTimer();
   };
 
@@ -67,24 +139,15 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      {/* Fotocamera nascosta */}
       <CameraView
         style={{ width: 0, height: 0, opacity: 0 }}
         facing={facing}
         enableTorch={torchEnabled}
       />
-
-      {/* Timer visibile */}
       <View style={styles.timerContainer}>
         <Text style={styles.timer}>{timer}s</Text>
       </View>
 
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={toggleTorch}>
-          <Text style={styles.text}>{torchEnabled ? 'Turn Flash Off' : 'Turn Flash On'}</Text>
-        </TouchableOpacity>
-
-      </View>
     </View>
   );
 }
@@ -100,12 +163,12 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   timerContainer: {
-  position: 'absolute',
-  top: 40,
-  left: 0,
-  right: 0,
-  alignItems: 'center',
-  zIndex: 20,
+    position: 'absolute',
+    top: 40,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    zIndex: 20,
   },
   timer: {
     fontSize: 55,
