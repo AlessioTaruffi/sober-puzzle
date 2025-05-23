@@ -1,4 +1,4 @@
-import * as Haptics from 'expo-haptics';
+import Slider from '@react-native-community/slider';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
@@ -35,6 +35,9 @@ export default function MinigameConta() {
   const [passers, setPassers] = useState<Passer[]>([]);
   const [gameOver, setGameOver] = useState(false);
   const [correctBeerCount, setCorrectBeerCount] = useState(0);
+  const [correctWaterCount, setCorrectWaterCount] = useState(0);
+  const [userBeerInput, setUserBeerInput] = useState(0);
+  const [userWaterInput, setUserWaterInput] = useState(0);  
   const [userInput, setUserInput] = useState('');
   const [gameAreaLayout, setGameAreaLayout] = useState({ x: 0, y: 0 });  
   const [isReady, setIsReady] = useState(false);
@@ -45,6 +48,7 @@ export default function MinigameConta() {
     setPassers([]);
     setUserInput('');
     setCorrectBeerCount(0);
+    setCorrectWaterCount(0);
     setGameOver(false);
   };
 
@@ -61,6 +65,8 @@ export default function MinigameConta() {
 
     setPassers(newPassers);
     setCorrectBeerCount(newPassers.filter(p => p.type === 'beer').length);
+    setCorrectWaterCount(newPassers.filter(p => p.type === 'water').length);
+
     setIsReady(true);
 
     const timer = setTimeout(() => {
@@ -88,63 +94,78 @@ export default function MinigameConta() {
     move();
   };
 
-  const handleSubmit = () => {
-    const userGuess = parseInt(userInput, 10);
-    if (isNaN(userGuess)) {
-      Alert.alert('Error', 'Please insert a valid number.');
-      return;
-    }
+const handleSubmit = () => {
+  const isBeerCorrect = userBeerInput === correctBeerCount;
+  const isWaterCorrect = userWaterInput === correctWaterCount;
 
-    const isCorrect = userGuess === correctBeerCount;
+  const isCorrect = isBeerCorrect && isWaterCorrect;
 
-    Alert.alert(
-      isCorrect ? 'Correct!' : 'Wrong',
-      isCorrect
-        ? 'You maybe deserve one 🎉'
-        : 'Better stop drinking Mate!',
-      [
-        {
-          text: 'OK',
-          onPress: () => {
-            setNavigating(true);
-            resetGame();
-            
-            // Ritornare alla schermata precedente
-            setTimeout(() => {
-              router.back(); // Questo fa tornare indietro
-            }, 500);
-          },
+  Alert.alert(
+    isCorrect ? 'Correct!' : 'Wrong',
+    isCorrect
+      ? 'You have sharp eyes! 🧠🍻'
+      : `Actual beers: ${correctBeerCount}, water: ${correctWaterCount}`,
+    [
+      {
+        text: 'OK',
+        onPress: () => {
+          setNavigating(true);
+          resetGame();
+          setTimeout(() => {
+            router.back();
+          }, 500);
         },
-      ]
-    );
-  };
+      },
+    ]
+  );
+};
 
-  if (!isReady || gameOver || navigating) {
-     return (
+
+
+  if (!isReady || navigating) {
+  return <Text>Loading...</Text>;
+}
+
+if (gameOver) {
+  return (
     <View style={styles.container}>
-      {gameOver ? (
-        <>
-          <Text style={styles.title}>Tap once for each beer you saw</Text>
-          <TouchableOpacity
-            style={styles.tapArea}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-              setUserInput(prev => String(Number(prev) + 1));
-            }}
-          >
-            <Text style={styles.tapText}>Tap Count: {userInput || 0}</Text>
-          </TouchableOpacity>
+      <Text style={styles.title}>Quante birre e quante acque hai visto?</Text>
 
-          <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-            <Text style={styles.buttonText}>Check</Text>
-          </TouchableOpacity>
-        </>
-      ) : (
-        <Text>Loading...</Text>
-      )}
+      <Text style={{ fontSize: 18, marginTop: 20 }}>Birre: {userBeerInput}</Text>
+      <View style={styles.sliderRow}>
+        <Text>0</Text>
+        <Slider
+          style={styles.slider}
+          minimumValue={0}
+          maximumValue={TOTAL_PASSERS}
+          step={1}
+          value={userBeerInput}
+          onValueChange={setUserBeerInput}
+        />
+        <Text>{TOTAL_PASSERS}</Text>
+      </View>
+
+      <Text style={{ fontSize: 18, marginTop: 20 }}>Acqua: {userWaterInput}</Text>
+      <View style={styles.sliderRow}>
+        <Text>0</Text>
+        <Slider
+          style={styles.slider}
+          minimumValue={0}
+          maximumValue={TOTAL_PASSERS}
+          step={1}
+          value={userWaterInput}
+          onValueChange={setUserWaterInput}
+        />
+        <Text>{TOTAL_PASSERS}</Text>
+      </View>
+
+      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+        <Text style={styles.buttonText}>Verifica</Text>
+      </TouchableOpacity>
     </View>
   );
 }
+
   
 
   return (
@@ -243,5 +264,18 @@ tapText: {
   fontSize: 28,
   fontWeight: 'bold',
 },
+sliderRow: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  width: '100%',
+  paddingHorizontal: 10,
+  marginVertical: 10,
+},
+slider: {
+  flex: 1,
+  marginHorizontal: 10,
+},
+
 
 });
