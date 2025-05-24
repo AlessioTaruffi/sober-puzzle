@@ -5,6 +5,7 @@ import { Animated, Button, Dimensions, StyleSheet, Text, View } from 'react-nati
 
 const { width, height } = Dimensions.get('window');
 
+// APPOGGIO PER IL CODICE MEZZO FUNZIONANTE
 
 // IL MIRINO NON RIESCE AD ANDARE SOTTO AL CENTRO INIZIALE 
 // VORREI PIU' UNA COSA COME VR CHE COM'E' ORA

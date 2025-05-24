@@ -62,9 +62,9 @@ export default function minigame1() {
     const handlePress = (color: string) => {
       // Vibrazione compatibile
       if (Platform.OS === 'android') {
-        Vibration.vibrate(100);
+        Vibration.vibrate(10000);
       } else {
-        Vibration.vibrate(); // iOS vibra solo con questa chiamata base
+        Vibration.vibrate(10000); 
       }
     
       if (!activeColor || !reactionStart) return;
