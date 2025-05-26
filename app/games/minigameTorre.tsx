@@ -61,15 +61,17 @@ export default function App() {
     <View style={styles.container}>
       <Text style={styles.counterText}>Cubi: {stack.length}</Text>
 
-      <View
-        style={[
-          styles.stackContainer,
-          {
-            bottom: BOTTOM_MARGIN,
-            maxHeight: visibleAreaHeight,
-          },
-        ]}
-      >
+  <View
+    style={[
+      styles.stackContainer,
+      {
+        bottom: BOTTOM_MARGIN,
+        top: TOP_MARGIN, // ← AGGIUNTO
+        maxHeight: visibleAreaHeight,
+      },
+    ]}
+  >
+
         {visibleStack.map((cube) => (
           <Animated.View
             key={cube.id}
