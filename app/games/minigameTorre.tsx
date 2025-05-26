@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -11,8 +11,8 @@ import {
 
 const CUBE_SIZE = 50;
 const BUTTON_SIZE = 120;
-const TOP_MARGIN = 100; // spazio per la scritta
-const BOTTOM_MARGIN = 60 + BUTTON_SIZE / 2; // centro bottone
+const TOP_MARGIN = 100;
+const BOTTOM_MARGIN = 60 + BUTTON_SIZE / 2;
 
 export default function App() {
   const [stack, setStack] = useState<{ id: number; anim: Animated.Value }[]>([]);
@@ -35,43 +35,64 @@ export default function App() {
     setStack((prev) => [...prev, newCube]);
   };
 
-    const startVibrationAndStack = () => {
-        if (intervalRef.current !== null) return; // evita doppio avvio
+  const startVibrationAndStack = () => {
+    if (intervalRef.current !== null) return;
 
-        Vibration.vibrate(10000);
-        intervalRef.current = setInterval(() => {
-            addCubeToStack();
-        }, 500);
+    Vibration.vibrate(10000);
+    intervalRef.current = setInterval(() => {
+      addCubeToStack();
+    }, 500);
+  };
+
+  const stopVibrationAndStack = () => {
+    Vibration.cancel();
+    if (intervalRef.current !== null) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  };
+
+  // Rimozione automatica casuale ogni x secondi
+  useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout>;
+
+    const removeCubesRandomly = () => {
+      const x = Math.random() * 3000; // 0 - 3000 ms
+      const y = Math.floor(Math.random() * 3); // 0, 1 o 2
+
+      timeoutId = setTimeout(() => {
+        setStack((prev) => {
+          if (y === 0) return prev;
+          return prev.slice(0, Math.max(0, prev.length - y));
+        });
+
+        removeCubesRandomly();
+      }, x);
     };
 
+    removeCubesRandomly();
 
-    const stopVibrationAndStack = () => {
-        Vibration.cancel();
-        if (intervalRef.current !== null) {
-            clearInterval(intervalRef.current);
-            intervalRef.current = null; // ← reset
-        }
+    return () => {
+      clearTimeout(timeoutId);
     };
+  }, []);
 
-
-  // Solo gli ultimi N cubi visibili
   const visibleStack = stack.slice(-maxVisibleCubes);
 
   return (
     <View style={styles.container}>
       <Text style={styles.counterText}>Cubi: {stack.length}</Text>
 
-  <View
-    style={[
-      styles.stackContainer,
-      {
-        bottom: BOTTOM_MARGIN,
-        top: TOP_MARGIN, // ← AGGIUNTO
-        maxHeight: visibleAreaHeight,
-      },
-    ]}
-  >
-
+      <View
+        style={[
+          styles.stackContainer,
+          {
+            bottom: BOTTOM_MARGIN,
+            top: TOP_MARGIN,
+            maxHeight: visibleAreaHeight,
+          },
+        ]}
+      >
         {visibleStack.map((cube) => (
           <Animated.View
             key={cube.id}
@@ -127,7 +148,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: "100%",
     alignItems: "center",
-    justifyContent: "flex-end", // i cubi crescono verso l’alto
+    justifyContent: "flex-end",
     overflow: "hidden",
   },
   cube: {
