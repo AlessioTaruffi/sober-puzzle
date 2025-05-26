@@ -7,6 +7,7 @@ import {
   Vibration,
   Dimensions,
   Animated,
+  Modal,
 } from "react-native";
 
 const CUBE_SIZE = 50;
@@ -16,13 +17,57 @@ const BOTTOM_MARGIN = 60 + BUTTON_SIZE / 2;
 
 export default function App() {
   const [stack, setStack] = useState<{ id: number; anim: Animated.Value }[]>([]);
+  const [gameOver, setGameOver] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const intervalRef = useRef<number | null>(null);
+  const hasPassedLowerLine = useRef(false);
 
   const screenHeight = Dimensions.get("window").height;
   const visibleAreaHeight = screenHeight - TOP_MARGIN - BOTTOM_MARGIN;
-  const maxVisibleCubes = Math.floor(visibleAreaHeight / (CUBE_SIZE + 4));
+
+  // Calcolo più robusto dei limiti
+  const maxVisibleCubes = Math.max(10, Math.floor(visibleAreaHeight / (CUBE_SIZE + 4)));
+  const upperLimit = Math.floor(maxVisibleCubes * 0.15);
+  const lowerLimit = Math.floor(maxVisibleCubes * 0.5);
+
+const checkGameOver = (newLength: number) => {
+  // Se supera la soglia superiore → Game Over subito
+  if (newLength > upperLimit) {
+    triggerGameOver();
+    return true;
+  }
+
+  // Se ha superato almeno una volta la linea inferiore, lo segniamo
+  if (newLength >= lowerLimit) {
+    hasPassedLowerLine.current = true;
+  }
+
+  // Se aveva superato la linea inferiore e ora è sceso sotto → Game Over
+  if (hasPassedLowerLine.current && newLength < lowerLimit) {
+    triggerGameOver();
+    return true;
+  }
+
+  return false;
+};
+
+
+  const triggerGameOver = () => {
+    setGameOver(true);
+    setShowModal(true);
+    stopVibrationAndStack();
+  };
+
+  const resetGame = () => {
+    setStack([]);
+    setGameOver(false);
+    setShowModal(false);
+    hasPassedLowerLine.current = false;
+  };
 
   const addCubeToStack = () => {
+    if (gameOver) return;
+
     const newAnim = new Animated.Value(0);
     const newCube = { id: Date.now(), anim: newAnim };
 
@@ -32,11 +77,15 @@ export default function App() {
       useNativeDriver: false,
     }).start();
 
-    setStack((prev) => [...prev, newCube]);
+    setStack((prev) => {
+      const newStack = [...prev, newCube];
+      checkGameOver(newStack.length);
+      return newStack;
+    });
   };
 
   const startVibrationAndStack = () => {
-    if (intervalRef.current !== null) return;
+    if (gameOver || intervalRef.current !== null) return;
 
     Vibration.vibrate(10000);
     intervalRef.current = setInterval(() => {
@@ -52,21 +101,21 @@ export default function App() {
     }
   };
 
-  // Rimozione automatica casuale ogni x secondi
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout>;
 
     const removeCubesRandomly = () => {
-      const x = Math.random() * 3000; // 0 - 3000 ms
-      const y = Math.floor(Math.random() * 3); // 0, 1 o 2
+      const x = Math.random() * 3000;
+      const y = Math.floor(Math.random() * 3);
 
       timeoutId = setTimeout(() => {
         setStack((prev) => {
-          if (y === 0) return prev;
-          return prev.slice(0, Math.max(0, prev.length - y));
+          const newStack = y === 0 ? prev : prev.slice(0, Math.max(0, prev.length - y));
+          checkGameOver(newStack.length);
+          return newStack;
         });
 
-        removeCubesRandomly();
+        if (!gameOver) removeCubesRandomly();
       }, x);
     };
 
@@ -75,7 +124,7 @@ export default function App() {
     return () => {
       clearTimeout(timeoutId);
     };
-  }, []);
+  }, [gameOver]);
 
   const visibleStack = stack.slice(-maxVisibleCubes);
 
@@ -93,6 +142,21 @@ export default function App() {
           },
         ]}
       >
+        {/* Linea rossa superiore */}
+        <View
+          style={[
+            styles.redLine,
+            { top: visibleAreaHeight * (upperLimit / maxVisibleCubes) },
+          ]}
+        />
+        {/* Linea rossa inferiore */}
+        <View
+          style={[
+            styles.redLine,
+            { top: visibleAreaHeight * (lowerLimit / maxVisibleCubes) },
+          ]}
+        />
+
         {visibleStack.map((cube) => (
           <Animated.View
             key={cube.id}
@@ -121,10 +185,24 @@ export default function App() {
         style={({ pressed }) => [
           styles.button,
           pressed && styles.buttonPressed,
+          gameOver && { opacity: 0.3 },
         ]}
+        disabled={gameOver}
       >
         <Text style={styles.buttonText}></Text>
       </Pressable>
+
+      {/* Modal di fine gioco */}
+      <Modal visible={showModal} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Game Over</Text>
+            <Pressable onPress={resetGame} style={styles.retryButton}>
+              <Text style={styles.retryButtonText}>Riprova</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -173,5 +251,41 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "transparent",
+  },
+  redLine: {
+    position: "absolute",
+    width: "100%",
+    height: 3,
+    backgroundColor: "red",
+    zIndex: 1,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.7)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    backgroundColor: "#222",
+    padding: 30,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 24,
+    color: "#fff",
+    marginBottom: 20,
+    fontWeight: "bold",
+  },
+  retryButton: {
+    backgroundColor: "#00FFFF",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    color: "#000",
+    fontWeight: "bold",
+    fontSize: 16,
   },
 });
