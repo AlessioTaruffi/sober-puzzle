@@ -1,13 +1,13 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  Vibration,
-  Dimensions,
   Animated,
+  Dimensions,
   Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  Vibration,
+  View,
 } from "react-native";
 
 const CUBE_SIZE = 50;
@@ -116,7 +116,8 @@ export default function App() {
     if (
       maxStackLengthReached.current >= lowerLineGameOverThresholdCubes &&
       stack.length < lowerLineGameOverThresholdCubes &&
-      !gameOver
+      !gameOver &&
+      stack.length < 5
     ) {
       triggerGameOver();
     }
@@ -163,18 +164,20 @@ export default function App() {
         ))}
       </View>
 
-      <Pressable
-        onPressIn={startVibrationAndStack}
-        onPressOut={stopVibrationAndStack}
-        style={({ pressed }) => [
-          styles.button,
-          pressed && styles.buttonPressed,
-          gameOver && { opacity: 0.3 },
-        ]}
-        disabled={gameOver}
-      >
-        <Text></Text>
-      </Pressable>
+    <Pressable
+      onPressIn={startVibrationAndStack}
+      onPressOut={stopVibrationAndStack}
+      onPress={addCubeToStack}
+      style={({ pressed }) => [
+        styles.button,
+        pressed && styles.buttonPressed,
+        gameOver && { opacity: 0.3 },
+      ]}
+      disabled={gameOver}
+    >
+      <Text></Text>
+    </Pressable>
+
 
       <Modal visible={showModal} transparent animationType="fade">
         <View style={styles.modalOverlay}>
