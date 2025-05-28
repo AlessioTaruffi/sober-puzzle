@@ -21,11 +21,12 @@ const GAME_AREA_HEIGHT = height * 0.8;
 const images = {
   beer: require('../../assets/images/beer.png'),
   water: require('../../assets/images/water.png'),
+  'food': require('../../assets/images/food.png'),
 };
 
 type Passer = {
   id: number;
-  type: 'beer' | 'water';
+  type: 'beer' | 'water' | 'food';
   x: Animated.Value;
   y: Animated.Value;
 };
@@ -36,8 +37,10 @@ export default function MinigameConta() {
   const [gameOver, setGameOver] = useState(false);
   const [correctBeerCount, setCorrectBeerCount] = useState(0);
   const [correctWaterCount, setCorrectWaterCount] = useState(0);
+  const [correctFoodCount, setCorrectFoodCount] = useState(0);
   const [userBeerInput, setUserBeerInput] = useState(0);
-  const [userWaterInput, setUserWaterInput] = useState(0);  
+  const [userWaterInput, setUserWaterInput] = useState(0); 
+  const [userFoodInput, setUserFoodInput] = useState(0); 
   const [userInput, setUserInput] = useState('');
   const [gameAreaLayout, setGameAreaLayout] = useState({ x: 0, y: 0 });  
   const [isReady, setIsReady] = useState(false);
@@ -56,7 +59,8 @@ export default function MinigameConta() {
     if (gameOver) return;
 
     const newPassers: Passer[] = Array.from({ length: TOTAL_PASSERS }, (_, i) => {
-      const type = Math.random() < 0.4 ? 'beer' : 'water';
+      const prob = Math.random();
+      const type: 'beer' | 'water' | 'food' = prob < 0.4 ? 'beer' : prob < 0.8 ? 'water' : 'food';
       const x = new Animated.Value(Math.random() * (GAME_AREA_WIDTH - 40));
       const y = new Animated.Value(Math.random() * (GAME_AREA_HEIGHT - 40));
       animateMovement(x, y);
@@ -66,6 +70,7 @@ export default function MinigameConta() {
     setPassers(newPassers);
     setCorrectBeerCount(newPassers.filter(p => p.type === 'beer').length);
     setCorrectWaterCount(newPassers.filter(p => p.type === 'water').length);
+    setCorrectFoodCount(newPassers.filter(p => p.type === 'food').length);
 
     setIsReady(true);
 
@@ -97,8 +102,9 @@ export default function MinigameConta() {
 const handleSubmit = () => {
   const isBeerCorrect = userBeerInput === correctBeerCount;
   const isWaterCorrect = userWaterInput === correctWaterCount;
+  const isFoodCorrect = userFoodInput === correctFoodCount;
 
-  const isCorrect = isBeerCorrect && isWaterCorrect;
+  const isCorrect = isBeerCorrect && isWaterCorrect && isFoodCorrect;
 
   Alert.alert(
     isCorrect ? 'Correct!' : 'Wrong',
@@ -157,6 +163,21 @@ if (gameOver) {
           onValueChange={setUserWaterInput}
         />
         <Text>{TOTAL_PASSERS}</Text>
+      </View>
+
+      <Text style={{ fontSize: 18, marginTop: 20 }}>Cibo: {userFoodInput}</Text>
+      <View style={styles.sliderRow}>
+        <Text>0</Text>
+        <Slider
+          style={styles.slider}
+          minimumValue={0}
+          maximumValue={TOTAL_PASSERS}
+          step={1}
+          value={userFoodInput}
+          onValueChange={setUserFoodInput}
+        />
+        <Text>{TOTAL_PASSERS}</Text>
+        
       </View>
 
       <TouchableOpacity style={styles.button} onPress={handleSubmit}>
