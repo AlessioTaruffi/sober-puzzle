@@ -1,16 +1,23 @@
-import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
+import { CameraType, CameraView, useCameraPermissions } from 'expo-camera';
+import { useRouter } from 'expo-router';
+import { Accelerometer } from 'expo-sensors';
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Button,
   Alert,
+  Button,
+  StyleSheet,
+  Text,
+  View
 } from 'react-native';
-import { Accelerometer } from 'expo-sensors';
+import { gamesList } from './gamesList';
 
 export default function App() {
+
+  const router = useRouter();
+  const currentGame = "/games/minigameLight";
+  const currentIndex = gamesList.indexOf(currentGame);
+  const nextGame = gamesList[currentIndex + 1] 
+
   const [facing, setFacing] = useState<CameraType>('back');
   const [permission, requestPermission] = useCameraPermissions();
   const [torchEnabled, setTorchEnabled] = useState(false);
@@ -109,7 +116,14 @@ export default function App() {
 
   Alert.alert(
     '⏰ Tempo scaduto!',
-    `Media tempi di reazione: ${media === 'N/A' ? media : media + ' ms'}`
+    `Media tempi di reazione: ${media === 'N/A' ? media : media + ' ms'}`,
+    [
+      {
+        text: 'Prossimo gioco',
+        onPress: () => router.push(nextGame as any),
+        style: 'default',
+      },
+    ]
   );
   };
 

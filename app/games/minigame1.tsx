@@ -1,5 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
+import { gamesList } from "./gamesList";
 
+import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Alert,
@@ -21,6 +23,8 @@ export default function minigame1() {
     const [reactionStart, setReactionStart] = useState<number | null>(null);
     const [_, setForceUpdate] = useState(0);
     const resultsRef = useRef<{ time: number; correct: boolean }[]>([]);
+    const [showEndScreen, setShowEndScreen] = useState(false);
+
   
     const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
     const colorTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -84,31 +88,34 @@ export default function minigame1() {
     
     
   
-    const handleEndGame = () => {
-      if (activeColor && reactionStart) {
-        resultsRef.current.push({
-          time: Date.now() - reactionStart,
-          correct: false,
-        });
-      }
-  
-      const allResults = resultsRef.current;
-      const correct = allResults.filter((r) => r.correct).length;
-      const wrong = allResults.filter((r) => !r.correct).length;
-      const avgTime = allResults.length
-        ? (allResults.reduce((acc, cur) => acc + cur.time, 0) / allResults.length).toFixed(0)
-        : 0;
-  
-      Alert.alert(
-        'Gioco terminato!',
-        `🎯 Tentativi: ${allResults.length}\n✅ Corrette: ${correct}\n❌ Sbagliate: ${wrong}\n⏱ Tempo medio: ${avgTime} ms`
-      );
-  
-      setActiveColor(null);
-      setReactionStart(null);
-      resultsRef.current = [];
-      setForceUpdate((n) => n + 1);
-    };
+  const handleEndGame = () => {
+    if (activeColor && reactionStart) {
+      resultsRef.current.push({
+        time: Date.now() - reactionStart,
+        correct: false,
+      });
+    }
+
+    const allResults = resultsRef.current;
+    const correct = allResults.filter((r) => r.correct).length;
+    const wrong = allResults.filter((r) => !r.correct).length;
+    const avgTime = allResults.length
+      ? (allResults.reduce((acc, cur) => acc + cur.time, 0) / allResults.length).toFixed(0)
+      : 0;
+
+    // Puoi rimuovere l'Alert se vuoi solo la schermata finale
+    Alert.alert(
+      'Gioco terminato!',
+      `🎯 Tentativi: ${allResults.length}\n✅ Corrette: ${correct}\n❌ Sbagliate: ${wrong}\n⏱ Tempo medio: ${avgTime} ms`
+    );
+
+    setActiveColor(null);
+    setReactionStart(null);
+    resultsRef.current = [];
+    setForceUpdate((n) => n + 1);
+    setShowEndScreen(true); // MOSTRA la schermata di fine gioco
+  };
+
   
     const restartGame = () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
@@ -119,10 +126,44 @@ export default function minigame1() {
       setActiveColor(null);
       setReactionStart(null);
       setForceUpdate((n) => n + 1);
-  
+      setShowEndScreen(false);
       startTimer();
       scheduleNextColor();
     };
+
+    const router = useRouter();
+    const currentGame = "/games/minigame1";
+    const currentIndex = gamesList.indexOf(currentGame);
+    const nextGame = gamesList[currentIndex + 1] 
+
+    if (showEndScreen) {
+      return (
+        <View style={styles.container}>
+          <Text style={styles.title}>🎮 Gioco Terminato!</Text>
+
+          <TouchableOpacity style={styles.button} onPress={restartGame}>
+            <Text style={styles.restartText}>🔁 Rigioca</Text>
+          </TouchableOpacity>
+
+          {nextGame ? (
+            <TouchableOpacity
+              style={[styles.button, { marginTop: 20 }]}
+              onPress={() => {
+                setShowEndScreen(false);
+                router.push(nextGame as any);
+              }}
+            >
+              <Text style={styles.restartText}>➡️ Prossimo Gioco</Text>
+            </TouchableOpacity>
+          ) : (
+            <Text style={{ color: "white", marginTop: 20 }}>
+              Hai completato tutti i giochi!
+            </Text>
+          )}
+        </View>
+      );
+  }
+
   
     return (
       <View style={styles.container}>

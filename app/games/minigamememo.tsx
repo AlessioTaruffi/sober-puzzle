@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
     Alert,
@@ -8,6 +9,7 @@ import {
     View
 } from 'react-native';
 import FlipCard from './flipcard';
+import { gamesList } from "./gamesList";
 
 //definizione di un tipo per i dati delle carte
 //in questo caso, ogni carta ha un id, uno stato di rivelazione e uno stato di selezione
@@ -20,6 +22,11 @@ type CardData = {
 const GRID_SIZE = 5;
 const CARD_COUNT = GRID_SIZE * GRID_SIZE;
 //const MAX_ROUND = 10;
+
+const router = useRouter();
+const currentGame = "/games/minigamememo";
+const currentIndex = gamesList.indexOf(currentGame);
+const nextGame = gamesList[currentIndex + 1] 
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const CARD_MARGIN = 5;
@@ -62,12 +69,9 @@ const GameScreen = () => {
             'Tempo scaduto',
             `Round massimo: ${maxRound}`,
             [{
-                text: 'Ricomincia',
+                text: 'Prossimo gioco',
                 onPress: () => {
-                setRound(1);
-                setMaxRound(1);
-                setTimeLeft(60);
-                setForceReset(prev => prev + 1);
+                    router.push(nextGame as any); //vai al prossimo gioco
                 }
             }]
             );

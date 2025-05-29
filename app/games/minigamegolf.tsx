@@ -1,7 +1,9 @@
+import { useRouter } from "expo-router";
 import { Gyroscope } from 'expo-sensors';
 import { useEffect, useRef, useState } from 'react';
-import { Dimensions, StyleSheet, Text, View } from "react-native";
+import { Button, Dimensions, StyleSheet, Text, View } from "react-native";
 import Svg, { Path } from 'react-native-svg';
+import { gamesList } from "./gamesList";
 
 export default function MinigameGolf() {
 
@@ -11,6 +13,11 @@ export default function MinigameGolf() {
 
     const [gyroBias, setGyroBias] = useState({ x: 0, y: 0 });
     const [isCalibrating, setIsCalibrating] = useState(true);
+
+    const router = useRouter();
+    const currentGame = "/games/minigamegolf";
+    const currentIndex = gamesList.indexOf(currentGame);
+    const nextGame = gamesList[currentIndex + 1] 
 
     const calibrateGyroscope = async () => {
         setIsCalibrating(true);
@@ -305,7 +312,11 @@ export default function MinigameGolf() {
             {(hasWon || hasLost || isCalibrating) && (
         <View style={styles.overlay}>
             <View style={styles.messageBox}>
-            {hasWon && <Text style={styles.winText}>🏆 Hai vinto!</Text>}
+            {hasWon && 
+            <View>
+                <Text style={styles.winText}>🏆 Hai vinto!</Text>
+                <Button title="Prossimo gioco" onPress={() => router.push(nextGame as any)} />
+            </View>}
             {hasLost && <Text style={[styles.winText, { color: 'red' }]}>💀 Hai perso!</Text>}
             {isCalibrating && <Text style={[styles.winText, { color: 'orange' }]}>⏳ Calibrazione...</Text>}
             </View>

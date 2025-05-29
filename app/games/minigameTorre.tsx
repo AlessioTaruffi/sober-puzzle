@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Animated,
@@ -9,12 +10,18 @@ import {
   Vibration,
   View,
 } from "react-native";
+import { gamesList } from "./gamesList";
 
 const CUBE_SIZE = 50;
 const BUTTON_SIZE = 120;
 const TOP_MARGIN = 100;
 const BOTTOM_MARGIN = 60 + BUTTON_SIZE / 2;
 const CUBE_VERTICAL_MARGIN = 2;
+
+  const router = useRouter();
+  const currentGame = "/games/minigameTorre";
+  const currentIndex = gamesList.indexOf(currentGame);
+  const nextGame = gamesList[currentIndex + 1] 
 
 export default function App() {
   const [stack, setStack] = useState<{ id: number; anim: Animated.Value }[]>([]);
@@ -183,8 +190,8 @@ export default function App() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Game Over</Text>
-            <Pressable onPress={resetGame} style={styles.retryButton}>
-              <Text style={styles.retryButtonText}>Riprova</Text>
+            <Pressable onPress={()=> router.push(nextGame as any)} style={styles.retryButton}>
+              <Text style={styles.retryButtonText}>Prossimo gioco</Text>
             </Pressable>
           </View>
         </View>
