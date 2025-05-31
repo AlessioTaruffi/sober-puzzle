@@ -1,21 +1,26 @@
-//lista dei minigiochi
 import { Link } from "expo-router";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 export default function GamesHome() {
 
   const titleScreen = require("../../assets/images/AppTitle.png");
 
-
   return (
     
-    
     <View style={styles.container}>
-      {/* Background image can be added here if needed 
-      <Image source={titleScreen} style={{ width: "100%", height: 200, marginTop:170, marginRight: 90}} />
-      <Text style={styles.title}>Scegli un minigioco:</Text>
-      */}
+      
 
+      <Image source={titleScreen} style={{ width: "100%", height: 200, marginBottom:200}} />
+      
+
+      {/* TEST ENTRY POINT */}
+      <Link href="/games/minigame1" asChild>
+        <Pressable>
+          <Text style={styles.takeTestText}>Take the test</Text>
+        </Pressable>
+      </Link>
+
+      {/* Tutti i pulsanti dei minigiochi sono stati commentati per semplificare l'interfaccia
       <Link href="/games/minigame1" asChild>
         <Pressable style={styles.button}>
           <Text style={styles.buttonText}>Dal primo</Text>
@@ -45,7 +50,7 @@ export default function GamesHome() {
           <Text style={styles.buttonText}>Minigioco memo</Text>
         </Pressable>
       </Link>
-      
+
       <Link href="/games/minigameTorre" asChild>
         <Pressable style={styles.button}>
           <Text style={styles.buttonText}>Minigioco Torre</Text>
@@ -57,7 +62,8 @@ export default function GamesHome() {
           <Text style={styles.buttonText}>Minigioco Shot</Text>
         </Pressable>
       </Link>
-            <Link href="/games/minigameLigth" asChild>
+
+      <Link href="/games/minigameLigth" asChild>
         <Pressable style={styles.button}>
           <Text style={styles.buttonText}>Minigioco Light</Text>
         </Pressable>
@@ -68,18 +74,38 @@ export default function GamesHome() {
           <Text style={styles.buttonText}>Minigioco ContaPassanti</Text>
         </Pressable>
       </Link>
+      */}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor:"white" },
-  title: { fontSize: 24, marginBottom: 20 },
+  container: { 
+    flex: 1, 
+    justifyContent: "center", 
+    alignItems: "center", 
+    backgroundColor: "white" 
+  },
+  title: { 
+    fontSize: 24, 
+    marginBottom: 20 
+  },
   button: {
     backgroundColor: "#3498db",
     padding: 16,
     borderRadius: 10,
     marginVertical: 10,
   },
-  buttonText: { color: "white", fontSize: 18 },
+  buttonText: { 
+    color: "white", 
+    fontSize: 18 
+  },
+
+  // Nuovo stile per "Take the test"
+  takeTestText: {
+    fontSize: 26,
+    color: "#2c3e50",
+    textDecorationLine: 'underline',
+    marginBottom: 250,
+  },
 });
