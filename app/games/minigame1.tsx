@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Animated, Easing, StyleSheet, Text, View } from "react-native";
 import { gamesList } from "./gamesList";
 
 import { useRouter } from "expo-router";
@@ -16,6 +16,40 @@ const COLORS = ['red', 'blue', 'green', 'yellow', 'purple', 'orange'];
 export default function minigame1() {
 
   const screenWidth = Dimensions.get('window').width;
+  const shakeAnim = useRef(new Animated.Value(0)).current; //animazione per shake
+
+  //funzione che gestisce l'animazione di shake
+  const triggerShake = () => {
+    shakeAnim.setValue(0);
+    Animated.sequence([
+      Animated.timing(shakeAnim, {
+        toValue: 1,
+        duration: 100,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeAnim, {
+        toValue: -1,
+        duration: 100,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeAnim, {
+        toValue: 1,
+        duration: 100,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeAnim, {
+        toValue: 0,
+        duration: 100,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
+
   
   const [timer, setTimer] = useState(20);
   const [activeColor, setActiveColor] = useState<string | null>(null);
@@ -70,6 +104,7 @@ export default function minigame1() {
 
 
     if (!correct){
+      triggerShake(); //attiva animazione di shake se la risposta è sbagliata
       Vibration.vibrate(500); 
     } else {
       Vibration.vibrate(50);
@@ -172,16 +207,25 @@ export default function minigame1() {
   
         <Text style={styles.timer}>{timer}s</Text>
   
-        <View
+        <Animated.View
           style={[
             styles.colorBox,
             {
               backgroundColor: activeColor || '#999',
               borderWidth: activeColor ? 4 : 0,
               borderColor: 'white',
+              transform: [
+                {
+                  translateX: shakeAnim.interpolate({
+                    inputRange: [-1, 1],
+                    outputRange: [-10, 10], // quanto "oscilla"
+                  }),
+                },
+              ],
             },
           ]}
         />
+
   
         <View style={styles.buttonContainer}>
           {COLORS.map((color) => (
