@@ -7,6 +7,7 @@ import {
   Button,
   StyleSheet,
   Text,
+  Vibration,
   View
 } from 'react-native';
 import { gamesList } from './gamesList';
@@ -71,6 +72,7 @@ export default function App() {
     const delay = Math.random() * 5000;
     torchTimeout.current = setTimeout(() => {
       torchStartTime.current = Date.now();
+      Vibration.vibrate(100);
       setTorchEnabled(true);
     }, delay);
   };
