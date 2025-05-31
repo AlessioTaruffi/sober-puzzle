@@ -1,10 +1,17 @@
 //lista dei minigiochi
 import { Link } from "expo-router";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 export default function GamesHome() {
+
+  const titleScreen = require("../../assets/images/AppTitle.png");
+
+
   return (
+    
+    
     <View style={styles.container}>
+      <Image source={titleScreen} style={{ width: "100%", height: 200, marginTop:170, marginRight: 90}} />
       <Text style={styles.title}>Scegli un minigioco:</Text>
 
       <Link href="/games/minigame1" asChild>
@@ -64,7 +71,7 @@ export default function GamesHome() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", alignItems: "center" },
+  container: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor:"white" },
   title: { fontSize: 24, marginBottom: 20 },
   button: {
     backgroundColor: "#3498db",
