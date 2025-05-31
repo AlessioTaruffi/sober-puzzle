@@ -6,9 +6,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   Alert,
   Dimensions,
-  Platform,
   TouchableOpacity,
-  Vibration,
+  Vibration
 } from 'react-native';
 
 const COLORS = ['red', 'blue', 'green', 'yellow', 'purple', 'orange'];
@@ -18,71 +17,71 @@ export default function minigame1() {
 
   const screenWidth = Dimensions.get('window').width;
   
-    const [timer, setTimer] = useState(20);
-    const [activeColor, setActiveColor] = useState<string | null>(null);
-    const [reactionStart, setReactionStart] = useState<number | null>(null);
-    const [_, setForceUpdate] = useState(0);
-    const resultsRef = useRef<{ time: number; correct: boolean }[]>([]);
-    const [showEndScreen, setShowEndScreen] = useState(false);
+  const [timer, setTimer] = useState(20);
+  const [activeColor, setActiveColor] = useState<string | null>(null);
+  const [reactionStart, setReactionStart] = useState<number | null>(null);
+  const [_, setForceUpdate] = useState(0);
+  const resultsRef = useRef<{ time: number; correct: boolean }[]>([]);
+  const [showEndScreen, setShowEndScreen] = useState(false);
 
-  
-    const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-    const colorTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  
-    useEffect(() => {
-      startTimer();
-      scheduleNextColor();
-  
-      return () => {
-        if (intervalRef.current) clearInterval(intervalRef.current);
-        if (colorTimeoutRef.current) clearTimeout(colorTimeoutRef.current);
-      };
-    }, []);
-  
-    const startTimer = () => {
-      intervalRef.current = setInterval(() => {
-        setTimer((prev) => {
-          if (prev <= 1) {
-            clearInterval(intervalRef.current!);
-            clearTimeout(colorTimeoutRef.current!);
-            handleEndGame();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    };
-  
-    const scheduleNextColor = () => {
-      const delay = Math.floor(Math.random() * 4000) + 1000; // 1–4 sec
-      colorTimeoutRef.current = setTimeout(() => {
-        const newColor = COLORS[Math.floor(Math.random() * COLORS.length)];
-        setActiveColor(newColor);
-        setReactionStart(Date.now());
-      }, delay);
-    };
-  
-      // Non funziona la vibrazione quando si preme il bottone :(
-    const handlePress = (color: string) => {
-      // Vibrazione compatibile
-      if (Platform.OS === 'android') {
-        Vibration.vibrate(10000);
-      } else {
-        Vibration.vibrate(10000); 
-      }
-    
-      if (!activeColor || !reactionStart) return;
-    
-      const time = Date.now() - reactionStart;
-      const correct = color === activeColor;
-    
-      resultsRef.current.push({ time, correct });
-      setActiveColor(null);
-      setReactionStart(null);
-    
+
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const colorTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    startTimer();
+    scheduleNextColor();
+
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
       if (colorTimeoutRef.current) clearTimeout(colorTimeoutRef.current);
-      colorTimeoutRef.current = setTimeout(scheduleNextColor, 500);
     };
+  }, []);
+
+  const startTimer = () => {
+    intervalRef.current = setInterval(() => {
+      setTimer((prev) => {
+        if (prev <= 1) {
+          clearInterval(intervalRef.current!);
+          clearTimeout(colorTimeoutRef.current!);
+          handleEndGame();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  const scheduleNextColor = () => {
+    const delay = Math.floor(Math.random() * 1000) + 500; // Ritardo tra 1 e 1.5 secondi tra i colori. A STECCA SEEE
+    colorTimeoutRef.current = setTimeout(() => {
+      const newColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+      setActiveColor(newColor);
+      setReactionStart(Date.now());
+    }, delay);
+  };
+
+  const handlePress = (color: string) => {
+  
+    if (!activeColor || !reactionStart) return;
+  
+    const time = Date.now() - reactionStart;
+    const correct = color === activeColor;
+
+
+    if (!correct){
+      Vibration.vibrate(500); 
+    } else {
+      Vibration.vibrate(50);
+    }
+  
+    resultsRef.current.push({ time, correct });
+    setActiveColor(null);
+    setReactionStart(null);
+  
+    if (colorTimeoutRef.current) clearTimeout(colorTimeoutRef.current);
+    colorTimeoutRef.current = setTimeout(scheduleNextColor, 500);
+  };
     
     
     
