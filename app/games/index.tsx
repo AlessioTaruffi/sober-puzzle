@@ -1,6 +1,6 @@
 //lista dei minigiochi
 import { Link } from "expo-router";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 export default function GamesHome() {
 
@@ -11,8 +11,10 @@ export default function GamesHome() {
     
     
     <View style={styles.container}>
+      {/* Background image can be added here if needed 
       <Image source={titleScreen} style={{ width: "100%", height: 200, marginTop:170, marginRight: 90}} />
       <Text style={styles.title}>Scegli un minigioco:</Text>
+      */}
 
       <Link href="/games/minigame1" asChild>
         <Pressable style={styles.button}>
