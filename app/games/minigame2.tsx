@@ -56,28 +56,38 @@ export default function minigame2() {
 
   //aggiorna il timer ogni 200ms, controlla se è stabile e aggiorna balanceTime
   useEffect(() => {
-    let interval: number;
+    let balanceInterval: number;
+    let timerInterval: number;
 
     if (!gameOver) {
-      interval = setInterval(() => {
+      // Timer ogni 1 secondo
+      timerInterval = setInterval(() => {
         setTimer(prev => {
           if (prev <= 1) {
-            clearInterval(interval);
+            clearInterval(timerInterval);
+            clearInterval(balanceInterval);
             setGameOver(true);
             _unsubscribe();
             return 0;
           }
           return prev - 1;
         });
+      }, 1000);
 
+      // Controllo equilibrio ogni 200ms
+      balanceInterval = setInterval(() => {
         if (checkBalance()) {
-          setBalanceTime(prev => prev + 0.2); //aggiorna il tempo stabile
+          setBalanceTime(prev => prev + 0.2);
         }
       }, 200);
     }
 
-    return () => clearInterval(interval);
-  }, [gameOver, x, y, z]);
+    return () => {
+      clearInterval(timerInterval);
+      clearInterval(balanceInterval);
+    };
+  }, [gameOver]);
+
 
   //controlla che il giroscopio sia pressocché fermo lungo i 3 assi
   //se rimane entro 0.1 0.1 0.1 é considerato fermo
@@ -85,7 +95,7 @@ export default function minigame2() {
     if (Math.abs(x) < 0.1 && Math.abs(y) < 0.1 && Math.abs(z) < 0.1) {
       return true;
     } 
-    Vibration.vibrate(100); //vibra per 100ms
+    Vibration.vibrate(200); 
     return false;
   }
 
@@ -93,8 +103,11 @@ export default function minigame2() {
     return Math.trunc(value * 1000) / 1000;
   };
 
+  const isBalanced = checkBalance(); // chiamato solo una volta per render per controlalre bilanciamento
+
+
   return(
-    <View style={[styles.container, checkBalance() ? styles.green : styles.red]}>
+    <View style={[styles.container, isBalanced ? styles.green : styles.red]}>
 
       <Text style={styles.text}>Timer: {timer}s</Text>
       <Text style={styles.text}>Equilibrio: {truncateTo3Decimals(balanceTime)}s</Text>
