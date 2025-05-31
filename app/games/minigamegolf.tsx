@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
 import { Gyroscope } from 'expo-sensors';
 import { useEffect, useRef, useState } from 'react';
-import { Button, Dimensions, StyleSheet, Text, View } from "react-native";
+import { Button, Dimensions, StyleSheet, Text, Vibration, View } from "react-native";
 import Svg, { Path } from 'react-native-svg';
 import { gamesList } from "./gamesList";
 
@@ -13,6 +13,8 @@ export default function MinigameGolf() {
 
     const [gyroBias, setGyroBias] = useState({ x: 0, y: 0 });
     const [isCalibrating, setIsCalibrating] = useState(true);
+
+    const [tries, setTries] = useState(2); // Numero di tentativi
 
     const router = useRouter();
     const currentGame = "/games/minigamegolf";
@@ -248,7 +250,20 @@ export default function MinigameGolf() {
 
                 //se la pallina è uscita dal percorso, perdi
                 if (!isBallNearPath(centerX, centerY)) {
-                    setHasLost(true);
+                    Vibration.vibrate(200); //vibrazione se sconfitta
+                    if (tries > 0) {
+                        setTries(tries - 1); // decrementa i tentativi
+                    }
+                    if (tries <= 0) {
+                        setHasLost(true);
+                    } else {
+                        // Reset della pallina alla posizione iniziale
+                        newTop = 50;
+                        newLeft = pathOffsetX - 12.5;
+                        velocityRef.current.vx = 0;
+                        velocityRef.current.vy = 0;
+                    }
+
                 }
 
                 //Controllo collisione con la buca (distanza tra i centri dei cerchi)
@@ -273,7 +288,8 @@ export default function MinigameGolf() {
         <View style={[styles.container, { alignItems: 'center' }]} >
 
 
-            {/* Punti di controllo visibili */}
+            {/* toggle punti di controllo visibili */}
+            {/* Punti di controllo per la curva 
             {curvedPathPoints.map((point, index) => (
             <View
                 key={`control-${index}`}
@@ -288,7 +304,7 @@ export default function MinigameGolf() {
                 zIndex: 10,
                 }}
             />
-            ))}
+            ))} /*}
 
 
             {/* Percorso SVG */}
