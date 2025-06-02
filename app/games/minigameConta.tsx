@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
-const TOTAL_PASSERS = 10;
+
 
 const GAME_AREA_WIDTH = width * 0.9;
 const GAME_AREA_HEIGHT = height * 0.8;
@@ -21,7 +21,7 @@ const GAME_AREA_HEIGHT = height * 0.8;
 const images = {
   beer: require('../../assets/images/beer.png'),
   water: require('../../assets/images/water.png'),
-  'food': require('../../assets/images/food.png'),
+  food: require('../../assets/images/food.png'),
 };
 
 type Passer = {
@@ -31,7 +31,17 @@ type Passer = {
   y: Animated.Value;
 };
 
-export default function MinigameConta() {
+type MinigameContaProps = {
+  duration?: number;
+  numPassers?: number;
+  onNext?: () => void;
+};
+
+export default function MinigameConta({
+  duration = 2500,
+  numPassers = 10,
+  onNext,
+}: MinigameContaProps) {
 
   const [passers, setPassers] = useState<Passer[]>([]);
   const [gameOver, setGameOver] = useState(false);
@@ -58,7 +68,7 @@ export default function MinigameConta() {
   useEffect(() => {
     if (gameOver) return;
 
-    const newPassers: Passer[] = Array.from({ length: TOTAL_PASSERS }, (_, i) => {
+    const newPassers: Passer[] = Array.from({ length: numPassers }, (_, i) => {
       const prob = Math.random();
       const type: 'beer' | 'water' | 'food' = prob < 0.4 ? 'beer' : prob < 0.8 ? 'water' : 'food';
       const x = new Animated.Value(Math.random() * (GAME_AREA_WIDTH - 40));
@@ -76,7 +86,7 @@ export default function MinigameConta() {
 
     const timer = setTimeout(() => {
       setGameOver(true);
-    },  2500);
+    },  duration);
 
     return () => clearTimeout(timer);
   }, [gameOver]);
@@ -110,16 +120,11 @@ const handleSubmit = () => {
     isCorrect ? 'Correct!' : 'Wrong',
     isCorrect
       ? 'You have sharp eyes! 🧠🍻'
-      : `Actual beers: ${correctBeerCount}, water: ${correctWaterCount}`,
+      : `Actual beers: ${correctBeerCount}, water: ${correctWaterCount}, food: ${correctFoodCount}`,
     [
       {
         text: 'OK',
-        onPress: () => {
-          setNavigating(true);
-          resetGame();
-          setTimeout(() => {
-            router.back();
-          }, 500);
+        onPress: () => {onNext ? onNext() : router.back();
         },
       },
     ]
@@ -143,12 +148,12 @@ if (gameOver) {
         <Slider
           style={styles.slider}
           minimumValue={0}
-          maximumValue={TOTAL_PASSERS}
+          maximumValue={numPassers}
           step={1}
           value={userBeerInput}
           onValueChange={setUserBeerInput}
         />
-        <Text>{TOTAL_PASSERS}</Text>
+        <Text>{numPassers}</Text>
       </View>
 
       <Text style={{ fontSize: 18, marginTop: 20 }}>Acqua: {userWaterInput}</Text>
@@ -157,12 +162,12 @@ if (gameOver) {
         <Slider
           style={styles.slider}
           minimumValue={0}
-          maximumValue={TOTAL_PASSERS}
+          maximumValue={numPassers}
           step={1}
           value={userWaterInput}
           onValueChange={setUserWaterInput}
         />
-        <Text>{TOTAL_PASSERS}</Text>
+        <Text>{numPassers}</Text>
       </View>
 
       <Text style={{ fontSize: 18, marginTop: 20 }}>Cibo: {userFoodInput}</Text>
@@ -171,12 +176,12 @@ if (gameOver) {
         <Slider
           style={styles.slider}
           minimumValue={0}
-          maximumValue={TOTAL_PASSERS}
+          maximumValue={numPassers}
           step={1}
           value={userFoodInput}
           onValueChange={setUserFoodInput}
         />
-        <Text>{TOTAL_PASSERS}</Text>
+        <Text>{numPassers}</Text>
         
       </View>
 
