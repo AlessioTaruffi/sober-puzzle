@@ -1,4 +1,6 @@
-import { Stack } from 'expo-router';
+import { Slot } from 'expo-router';
+import { GameScoreProvider } from './games/GameScoreContext';
+
 
 /*
 Vecchio layout per implementare i tab
@@ -15,6 +17,10 @@ export default function RootLayout() {
 */
 
 export default function RootLayout() {
-  return <Stack />;
+  return (
+    <GameScoreProvider>
+      <Slot />
+    </GameScoreProvider>
+  );
 }
 

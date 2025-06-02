@@ -1,6 +1,8 @@
 import { Animated, Easing, StyleSheet, Text, View } from "react-native";
 import { gamesList } from "./gamesList";
 
+import { useGameScore } from "./GameScoreContext";
+
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from 'react';
 import {
@@ -14,6 +16,8 @@ const COLORS = ['red', 'blue', 'green', 'yellow', 'purple', 'orange'];
 
 
 export default function minigame1() {
+
+  const addResult = useGameScore();
 
   const screenWidth = Dimensions.get('window').width;
   const shakeAnim = useRef(new Animated.Value(0)).current; //animazione per shake
@@ -136,6 +140,16 @@ export default function minigame1() {
     const avgTime = allResults.length
       ? (allResults.reduce((acc, cur) => acc + cur.time, 0) / allResults.length).toFixed(0)
       : 0;
+
+    //aggiunge il risultato al contesto per passarlo alla schermata finale
+    const result = {
+      name: 'Minigame 1',
+      attempts: allResults.length,
+      correct,
+      wrong,
+      avgTime: Number(avgTime),
+    }
+    addResult.addResult('minigame1', result);
 
     // Puoi rimuovere l'Alert se vuoi solo la schermata finale
     Alert.alert(
