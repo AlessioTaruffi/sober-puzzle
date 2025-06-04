@@ -24,7 +24,7 @@ const GRID_SIZE = 5;
 const CARD_COUNT = GRID_SIZE * GRID_SIZE;
 //const MAX_ROUND = 10;
 
-const addResult = useGameScore();
+
 
 const router = useRouter();
 const currentGame = "/games/minigamememo";
@@ -37,6 +37,8 @@ const CARD_SIZE = (SCREEN_WIDTH - CARD_MARGIN * 2 * GRID_SIZE - 40) / GRID_SIZE;
 
 //funzione principale del gioco	 
 const GameScreen = () => {
+
+    const addResult = useGameScore();
 
     //stato del gioco
     //cards: array di carte definito sul tipo CardData

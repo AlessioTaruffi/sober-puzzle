@@ -23,9 +23,10 @@ const router = useRouter();
 const currentGame = "/games/minigameTorre";
 const currentIndex = gamesList.indexOf(currentGame);
 const nextGame = gamesList[currentIndex + 1] 
-const addResult = useGameScore();
 
 export default function App() {
+  const addResult = useGameScore();
+
   const [stack, setStack] = useState<{ id: number; anim: Animated.Value }[]>([]);
   const [gameOver, setGameOver] = useState(false);
   const [showModal, setShowModal] = useState(false);

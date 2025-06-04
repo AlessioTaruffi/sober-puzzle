@@ -58,6 +58,29 @@ export default function minigame2() {
   const [balanceTime, setBalanceTime] = useState<number>(0); //tempo totale in cui è stato stabile
   const [gameOver, setGameOver] = useState<boolean>(false); //se il gioco è finito
 
+  const saveResult = () => {
+    const result = {
+      name: 'Minigame 2',
+      balanceTime: truncateTo3Decimals(balanceTime),
+    }
+    addResult.addResult('minigame2', result);
+  }
+
+  //quando il gioco finisce, salva il risultato
+  //e lo aggiunge al contesto dei risultati
+  //questo viene eseguito quando il timer arriva a 0 
+  //cosí che sia fuori dal rendere e react non si incazzi
+  useEffect(() => {
+    if (gameOver) {
+      const result = {
+        name: 'Minigame 2',
+        balanceTime: truncateTo3Decimals(balanceTime),
+      };
+      addResult.addResult('minigame2', result);
+    }
+  }, [gameOver]);
+
+
   //aggiorna il timer ogni 200ms, controlla se è stabile e aggiorna balanceTime
   useEffect(() => {
     let balanceInterval: number;
@@ -71,12 +94,6 @@ export default function minigame2() {
             clearInterval(timerInterval);
             clearInterval(balanceInterval);
             setGameOver(true);
-            //aggiunge il risultato al contesto per passarlo alla schermata finale
-            const result = {
-              name: 'Minigame 2',
-              balanceTime: truncateTo3Decimals(balanceTime),
-            }
-            addResult.addResult('minigame2', result);
             _unsubscribe();
             return 0;
           }
@@ -86,10 +103,11 @@ export default function minigame2() {
 
       // Controllo equilibrio ogni 200ms
       balanceInterval = setInterval(() => {
-        if (checkBalance()) {
+        if (checkBalance(true)) {
           setBalanceTime(prev => prev + 0.2);
         }
       }, 200);
+
     }
 
     return () => {
@@ -101,19 +119,25 @@ export default function minigame2() {
 
   //controlla che il giroscopio sia pressocché fermo lungo i 3 assi
   //se rimane entro 0.1 0.1 0.1 é considerato fermo
-  const checkBalance = (): boolean => {
-    if (Math.abs(x) < 0.1 && Math.abs(y) < 0.1 && Math.abs(z) < 0.1) {
-      return true;
-    } 
-    Vibration.vibrate(200); 
-    return false;
+const checkBalance = (shouldVibrate = true): boolean => {
+  const balanced = Math.abs(x) < 0.1 && Math.abs(y) < 0.1 && Math.abs(z) < 0.1;
+  if (!balanced && shouldVibrate) {
+    Vibration.vibrate(200);
   }
+  return balanced;
+};
+
 
   const truncateTo3Decimals = (value: number): number => {
     return Math.trunc(value * 1000) / 1000;
   };
 
-  const isBalanced = checkBalance(); // chiamato solo una volta per render per controlalre bilanciamento
+  const [isBalanced, setIsBalanced] = useState(false);
+
+  useEffect(() => {
+    const balanced = checkBalance();
+    setIsBalanced(balanced);
+  }, [x, y, z]); // ogni volta che i dati del giroscopio cambiano, controlla se è bilanciato
 
 
   return(

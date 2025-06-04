@@ -11,14 +11,14 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { useGameScore } from "./GameScoreContext";
+import { useGameScore } from './GameScoreContext';
 
 const { width, height } = Dimensions.get('window');
 
 
 const GAME_AREA_WIDTH = width * 0.9;
 const GAME_AREA_HEIGHT = height * 0.8;
-const addResult = useGameScore();
+
 
 const images = {
   beer: require('../../assets/images/beer.png'),
@@ -40,10 +40,13 @@ type MinigameContaProps = {
 };
 
 export default function MinigameConta({
+  
   duration = 2500,
   numPassers = 10,
   onNext,
 }: MinigameContaProps) {
+
+  const addResult = useGameScore();
 
   const [passers, setPassers] = useState<Passer[]>([]);
   const [gameOver, setGameOver] = useState(false);
@@ -139,6 +142,7 @@ const handleSubmit = () => {
       },
     ]
   );
+  console.log(addResult.results);
 };
 
 

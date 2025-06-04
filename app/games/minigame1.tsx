@@ -61,6 +61,8 @@ export default function minigame1() {
   const [_, setForceUpdate] = useState(0);
   const resultsRef = useRef<{ time: number; correct: boolean }[]>([]);
   const [showEndScreen, setShowEndScreen] = useState(false);
+  const [gameEnded, setGameEnded] = useState(false);
+
 
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -133,36 +135,39 @@ export default function minigame1() {
         correct: false,
       });
     }
-
-    const allResults = resultsRef.current;
-    const correct = allResults.filter((r) => r.correct).length;
-    const wrong = allResults.filter((r) => !r.correct).length;
-    const avgTime = allResults.length
-      ? (allResults.reduce((acc, cur) => acc + cur.time, 0) / allResults.length).toFixed(0)
-      : 0;
-
-    //aggiunge il risultato al contesto per passarlo alla schermata finale
-    const result = {
-      name: 'Minigame 1',
-      attempts: allResults.length,
-      correct,
-      wrong,
-      avgTime: Number(avgTime),
-    }
-    addResult.addResult('minigame1', result);
-
-    // Puoi rimuovere l'Alert se vuoi solo la schermata finale
-    Alert.alert(
-      'Gioco terminato!',
-      `🎯 Tentativi: ${allResults.length}\n✅ Corrette: ${correct}\n❌ Sbagliate: ${wrong}\n⏱ Tempo medio: ${avgTime} ms`
-    );
-
-    setActiveColor(null);
-    setReactionStart(null);
-    resultsRef.current = [];
-    setForceUpdate((n) => n + 1);
-    setShowEndScreen(true); // MOSTRA la schermata di fine gioco
+    setGameEnded(true);
   };
+
+  //diviso per evitare l'update di gameEnded durante il render (react si incazza)
+  useEffect(() => {
+    if (gameEnded) {
+      const allResults = resultsRef.current;
+      const correct = allResults.filter((r) => r.correct).length;
+      const wrong = allResults.filter((r) => !r.correct).length;
+      const avgTime = allResults.length
+        ? (allResults.reduce((acc, cur) => acc + cur.time, 0) / allResults.length).toFixed(0)
+        : 0;
+
+      const result = {
+        name: 'Minigame 1',
+        attempts: allResults.length,
+        correct,
+        wrong,
+        avgTime: Number(avgTime),
+      };
+
+      addResult.addResult('minigame1', result);
+
+      Alert.alert(
+        'Gioco terminato!',
+        `🎯 Tentativi: ${allResults.length}\n✅ Corrette: ${correct}\n❌ Sbagliate: ${wrong}\n⏱ Tempo medio: ${avgTime} ms`
+      );
+
+      setShowEndScreen(true);
+      setGameEnded(false); // Resetto lo stato
+    }
+  }, [gameEnded]);
+
 
   
     const restartGame = () => {
