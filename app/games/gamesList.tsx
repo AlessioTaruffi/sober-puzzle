@@ -1,4 +1,5 @@
 export const gamesList = [
+  "/games/minigameConta",
   "/games/minigame1",
   "/games/minigame2",
   "/games/minigamegolf",

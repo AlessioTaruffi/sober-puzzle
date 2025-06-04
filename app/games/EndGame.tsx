@@ -1,9 +1,10 @@
 // EndScreen.tsx
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { useGameScore } from './GameScoreContext'; // path corretto al tuo context
+import { GameScoreProvider, useGameScore } from './GameScoreContext'; // path corretto al tuo context
 import { renderers } from './endScreenRenders'; // path corretto
+import { gamesList } from './gamesList';
 
 type Props = {
   gameName: string;
@@ -16,16 +17,25 @@ const defaultRenderer = (data: any) => (
       <Text key={key}>{key}: {JSON.stringify(value)}</Text>
     ))}
   </View>
-);
+);  
 
-export const EndScreen = ({ gameName, nextGameRoute }: Props) => {
+export default function EndScreen(){
+  const params = useLocalSearchParams();
+  const gameName = typeof params.gameName === 'string' ? params.gameName : '';
+
+  const nextGameRoute = gamesList[gamesList.indexOf(`/games/${gameName}`) + 1] || '/'; // Default to home if no next game
+  console.log('nextGameRoute:', nextGameRoute);
+  console.log('params:', gameName,nextGameRoute);
+
   const { results } = useGameScore();
   const router = useRouter();
 
   const data = results[gameName];
   const Renderer = renderers[gameName];
+  console.log('data:', data);
 
   return (
+    <GameScoreProvider>
     <View style={{ padding: 20 }}>
       <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 10 }}>
         Gioco completato: {gameName}
@@ -50,5 +60,6 @@ export const EndScreen = ({ gameName, nextGameRoute }: Props) => {
         <Text style={{ color: "white", textAlign: "center" }}>Prossimo gioco</Text>
       </TouchableOpacity>
     </View>
+    </GameScoreProvider>
   );
 };

@@ -1,8 +1,10 @@
 import Slider from '@react-native-community/slider';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
+
+
+
 import {
-  Alert,
   Animated,
   Dimensions,
   ImageBackground,
@@ -11,14 +13,16 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { useGameScore } from './GameScoreContext';
+import { useGameScore } from './GameScoreContext'; // Assicurati che il percorso sia corretto
+import { gamesList } from './gamesList';
 
 const { width, height } = Dimensions.get('window');
 
 
+const currentGameIndex = gamesList.indexOf('/games/minigameConta');
+const nextGameRoute = gamesList[currentGameIndex + 1];
 const GAME_AREA_WIDTH = width * 0.9;
 const GAME_AREA_HEIGHT = height * 0.8;
-
 
 const images = {
   beer: require('../../assets/images/beer.png'),
@@ -40,13 +44,9 @@ type MinigameContaProps = {
 };
 
 export default function MinigameConta({
-  
   duration = 2500,
   numPassers = 10,
-  onNext,
 }: MinigameContaProps) {
-
-  const addResult = useGameScore();
 
   const [passers, setPassers] = useState<Passer[]>([]);
   const [gameOver, setGameOver] = useState(false);
@@ -113,36 +113,25 @@ export default function MinigameConta({
     };
     move();
   };
-
+const {addResult} = useGameScore();
 const handleSubmit = () => {
-  const isBeerCorrect = userBeerInput === correctBeerCount;
-  const isWaterCorrect = userWaterInput === correctWaterCount;
-  const isFoodCorrect = userFoodInput === correctFoodCount;
-
-  const isCorrect = isBeerCorrect && isWaterCorrect && isFoodCorrect;
-
-  const numberOfErrors = Math.abs(userBeerInput - correctBeerCount) + Math.abs(userWaterInput - correctWaterCount) + Math.abs(userFoodInput - correctFoodCount);
-
-  const result = {
-    name: 'minigameConta',
-    corrette: numberOfErrors,
-  }
-  addResult.addResult('minigame2', result);
-
-  Alert.alert(
-    isCorrect ? 'Correct!' : 'Wrong',
-    isCorrect
-      ? 'You have sharp eyes! 🧠🍻'
-      : `Actual beers: ${correctBeerCount}, water: ${correctWaterCount}, food: ${correctFoodCount}`,
-    [
-      {
-        text: 'OK',
-        onPress: () => {onNext ? onNext() : router.back();
-        },
-      },
-    ]
-  );
-  console.log(addResult.results);
+  addResult('minigameConta', {
+    beers: {
+      user: userBeerInput,
+      correct: correctBeerCount,
+    },
+    water: {
+      user: userWaterInput,
+      correct: correctWaterCount,
+    },
+    food: {
+      user: userFoodInput,
+      correct: correctFoodCount,
+    },
+  });
+  console.log('eccomi qua');
+  router.push({pathname: './EndGame', params: { gameName: 'minigameConta', }});
+  
 };
 
 
@@ -154,7 +143,7 @@ const handleSubmit = () => {
 if (gameOver) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Quante birre e quante acque hai visto?</Text>
+      <Text style={styles.title}>Quanta roba hai visto?</Text>
 
       <Text style={{ fontSize: 18, marginTop: 20 }}>Birre: {userBeerInput}</Text>
       <View style={styles.sliderRow}>
