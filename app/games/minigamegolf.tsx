@@ -3,9 +3,12 @@ import { Gyroscope } from 'expo-sensors';
 import { useEffect, useRef, useState } from 'react';
 import { Button, Dimensions, StyleSheet, Text, Vibration, View } from "react-native";
 import Svg, { Path } from 'react-native-svg';
+import { useGameScore } from "./GameScoreContext";
 import { gamesList } from "./gamesList";
 
 export default function MinigameGolf() {
+
+    const addResult = useGameScore();
 
     //Dimensioni dello schermo 
     const SCREEN_WIDTH = Dimensions.get("window").width;
@@ -273,6 +276,11 @@ export default function MinigameGolf() {
 
                 if (distance < holePosition.radius) {
                     setHasWon(true);
+                    const result = {
+                        name: 'Minigame Golf',
+                        tries: 3 - tries, // Numero di tentativi utilizzati
+                    };
+                    addResult.addResult('minigameGolf', result);
                 }
 
                 return { top: newTop, left: newLeft };

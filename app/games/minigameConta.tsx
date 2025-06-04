@@ -11,12 +11,14 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import { useGameScore } from "./GameScoreContext";
 
 const { width, height } = Dimensions.get('window');
 
 
 const GAME_AREA_WIDTH = width * 0.9;
 const GAME_AREA_HEIGHT = height * 0.8;
+const addResult = useGameScore();
 
 const images = {
   beer: require('../../assets/images/beer.png'),
@@ -115,6 +117,14 @@ const handleSubmit = () => {
   const isFoodCorrect = userFoodInput === correctFoodCount;
 
   const isCorrect = isBeerCorrect && isWaterCorrect && isFoodCorrect;
+
+  const numberOfErrors = Math.abs(userBeerInput - correctBeerCount) + Math.abs(userWaterInput - correctWaterCount) + Math.abs(userFoodInput - correctFoodCount);
+
+  const result = {
+    name: 'minigameConta',
+    corrette: numberOfErrors,
+  }
+  addResult.addResult('minigame2', result);
 
   Alert.alert(
     isCorrect ? 'Correct!' : 'Wrong',

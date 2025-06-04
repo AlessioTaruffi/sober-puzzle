@@ -10,6 +10,7 @@ import {
   Vibration,
   View,
 } from "react-native";
+import { useGameScore } from "./GameScoreContext";
 import { gamesList } from "./gamesList";
 
 const CUBE_SIZE = 50;
@@ -18,10 +19,11 @@ const TOP_MARGIN = 100;
 const BOTTOM_MARGIN = 60 + BUTTON_SIZE / 2;
 const CUBE_VERTICAL_MARGIN = 2;
 
-  const router = useRouter();
-  const currentGame = "/games/minigameTorre";
-  const currentIndex = gamesList.indexOf(currentGame);
-  const nextGame = gamesList[currentIndex + 1] 
+const router = useRouter();
+const currentGame = "/games/minigameTorre";
+const currentIndex = gamesList.indexOf(currentGame);
+const nextGame = gamesList[currentIndex + 1] 
+const addResult = useGameScore();
 
 export default function App() {
   const [stack, setStack] = useState<{ id: number; anim: Animated.Value }[]>([]);
@@ -48,6 +50,10 @@ export default function App() {
   );
 
   const triggerGameOver = useCallback(() => {
+    const result = {
+      name: "minigame torre",
+    };
+    addResult.addResult("minigameTorre", result);
     setGameOver(true);
     setShowModal(true);
     stopVibrationAndStack();

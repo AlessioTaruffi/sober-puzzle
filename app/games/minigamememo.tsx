@@ -9,6 +9,7 @@ import {
     View
 } from 'react-native';
 import FlipCard from './flipcard';
+import { useGameScore } from "./GameScoreContext";
 import { gamesList } from "./gamesList";
 
 //definizione di un tipo per i dati delle carte
@@ -22,6 +23,8 @@ type CardData = {
 const GRID_SIZE = 5;
 const CARD_COUNT = GRID_SIZE * GRID_SIZE;
 //const MAX_ROUND = 10;
+
+const addResult = useGameScore();
 
 const router = useRouter();
 const currentGame = "/games/minigamememo";
@@ -65,6 +68,14 @@ const GameScreen = () => {
     // 2) alert quando timeLeft arriva a zero
     useEffect(() => {
         if (timeLeft === 0) {
+            
+            //salva il risultato del gioco
+            const result = {
+                name: "Minigame Memo",
+                maxRound: maxRound,
+            };
+            addResult.addResult("minigameMemo", result);
+
             Alert.alert(
             'Tempo scaduto',
             `Round massimo: ${maxRound}`,

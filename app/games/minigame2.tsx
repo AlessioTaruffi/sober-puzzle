@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { Button, StyleSheet, Text, Vibration, View } from "react-native";
 import { gamesList } from "./gamesList";
 
+import { useGameScore } from "./GameScoreContext";
+
 export default function minigame2() {
 
   //stato per i valori del giroscopio
@@ -17,6 +19,8 @@ export default function minigame2() {
   const currentGame = "/games/minigame2";
   const currentIndex = gamesList.indexOf(currentGame);
   const nextGame = gamesList[currentIndex + 1] 
+
+  const addResult = useGameScore();
   
 
 
@@ -67,6 +71,12 @@ export default function minigame2() {
             clearInterval(timerInterval);
             clearInterval(balanceInterval);
             setGameOver(true);
+            //aggiunge il risultato al contesto per passarlo alla schermata finale
+            const result = {
+              name: 'Minigame 2',
+              balanceTime: truncateTo3Decimals(balanceTime),
+            }
+            addResult.addResult('minigame2', result);
             _unsubscribe();
             return 0;
           }

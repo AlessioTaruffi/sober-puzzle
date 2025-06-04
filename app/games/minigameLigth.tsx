@@ -10,9 +10,12 @@ import {
   Vibration,
   View
 } from 'react-native';
+import { useGameScore } from "./GameScoreContext";
 import { gamesList } from './gamesList';
 
 export default function App() {
+
+  const addResult = useGameScore();
 
   const router = useRouter();
   const currentGame = "/games/minigameLight";
@@ -102,31 +105,40 @@ export default function App() {
   };
 
   const handleEndTimer = () => {
-  if (torchTimeout.current) {
-    clearTimeout(torchTimeout.current); // ✅ Cancella eventuale attivazione futura
-    torchTimeout.current = null;
-  }
+    if (torchTimeout.current) {
+      clearTimeout(torchTimeout.current); // ✅ Cancella eventuale attivazione futura
+      torchTimeout.current = null;
+    }
 
-  setTorchEnabled(false);
-  torchEnabledRef.current = false;
+    setTorchEnabled(false);
+    torchEnabledRef.current = false;
 
-  subscription?.remove();
+    subscription?.remove();
 
-  const media = reactionTimes.current.length
-    ? (reactionTimes.current.reduce((a, b) => a + b) / reactionTimes.current.length).toFixed(0)
-    : 'N/A';
 
-  Alert.alert(
-    '⏰ Tempo scaduto!',
-    `Media tempi di reazione: ${media === 'N/A' ? media : media + ' ms'}`,
-    [
-      {
-        text: 'Prossimo gioco',
-        onPress: () => router.push(nextGame as any),
-        style: 'default',
-      },
-    ]
-  );
+
+    const media = reactionTimes.current.length
+
+      ? (reactionTimes.current.reduce((a, b) => a + b) / reactionTimes.current.length).toFixed(0)
+      : 'N/A';
+
+    const result = {
+      name: 'Minigame Light',
+      media: media	
+    }
+    addResult.addResult('minigameLight', result);
+
+    Alert.alert(
+      '⏰ Tempo scaduto!',
+      `Media tempi di reazione: ${media === 'N/A' ? media : media + ' ms'}`,
+      [
+        {
+          text: 'Prossimo gioco',
+          onPress: () => router.push(nextGame as any),
+          style: 'default',
+        },
+      ]
+    );
   };
 
 
