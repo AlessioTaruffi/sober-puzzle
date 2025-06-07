@@ -5,7 +5,6 @@ export const gamesList = [
   "/games/minigamegolf",
   "/games/minigamememo",
   "/games/minigameTorre",
-  "/games/minigameShot",
   "/games/minigameLigth",
   "/games/minigameConta"
 ];

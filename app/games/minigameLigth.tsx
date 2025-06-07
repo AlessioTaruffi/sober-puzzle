@@ -33,6 +33,7 @@ export default function App() {
   const torchStartTime = useRef<number | null>(null);
   const reactionTimes = useRef<number[]>([]);
   const [subscription, setSubscription] = useState<any>(null);
+  const [gameEnd, setGameEnd] = useState(false);
 
   const torchEnabledRef = useRef(false); // NEW
 
@@ -122,11 +123,9 @@ export default function App() {
       ? (reactionTimes.current.reduce((a, b) => a + b) / reactionTimes.current.length).toFixed(0)
       : 'N/A';
 
-    const result = {
-      name: 'Minigame Light',
-      media: media	
-    }
-    addResult.addResult('minigameLight', result);
+    setGameEnd(true);
+
+    
 
     Alert.alert(
       '⏰ Tempo scaduto!',
@@ -140,6 +139,21 @@ export default function App() {
       ]
     );
   };
+
+  useEffect(() => {
+
+    const media = reactionTimes.current.length
+
+      ? (reactionTimes.current.reduce((a, b) => a + b) / reactionTimes.current.length).toFixed(0)
+      : 'N/A';
+
+    const result = {
+      name: 'Minigame Light',
+      reactionTime: media	
+    }
+    addResult.addResult('minigameLight', result);
+    setGameEnd(false);
+  }, [gameEnd]);
 
 
   const toggleTorch = () => {

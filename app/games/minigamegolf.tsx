@@ -276,11 +276,6 @@ export default function MinigameGolf() {
 
                 if (distance < holePosition.radius) {
                     setHasWon(true);
-                    const result = {
-                        name: 'Minigame Golf',
-                        tries: 3 - tries, // Numero di tentativi utilizzati
-                    };
-                    addResult.addResult('minigameGolf', result);
                 }
 
                 return { top: newTop, left: newLeft };
@@ -291,6 +286,29 @@ export default function MinigameGolf() {
         //o quando x ed y cambiano
         return () => clearInterval(interval);
     }, [x, y, hasWon, hasLost]);
+
+    useEffect(() => {
+        if (hasWon) {
+            const result = {
+                name: 'Minigame Golf',
+                tries: 3 - tries,
+                outcome: 'won',
+            };
+            addResult.addResult('minigameGolf', result);
+        }
+    }, [hasWon]);
+
+    useEffect(() => {
+        if (hasLost) {
+            const result = {
+                name: 'Minigame Golf',
+                tries: 3 - tries,
+                outcome: 'lost',
+            };
+            addResult.addResult('minigameGolf', result);
+        }
+    }, [hasLost]);
+
 
     return (
         <View style={[styles.container, { alignItems: 'center' }]} >
