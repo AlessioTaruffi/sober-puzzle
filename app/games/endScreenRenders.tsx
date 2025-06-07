@@ -25,4 +25,13 @@ export const renderers: Record<string, Renderer> = {
   }
 </View>
   ),
+  "minigame1": (data) => (
+    <View>
+      <Text>Tempo di reazione medio: {data.averageReactionTime} ms</Text>
+      <Text>Colore attivo: {data.activeColor}</Text>
+      <Text>Colore corretto: {data.correctColor}</Text>
+      <Text>Colore sbagliato: {data.wrongColor}</Text>
+      <Text>Numero di click: {data.clickCount}</Text>
+    </View>
+  ),
 };

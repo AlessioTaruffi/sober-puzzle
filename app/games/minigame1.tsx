@@ -6,7 +6,6 @@ import { useGameScore } from "./GameScoreContext";
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  Alert,
   Dimensions,
   TouchableOpacity,
   Vibration
@@ -158,10 +157,11 @@ export default function minigame1() {
 
       addResult.addResult('minigame1', result);
 
-      Alert.alert(
-        'Gioco terminato!',
-        `🎯 Tentativi: ${allResults.length}\n✅ Corrette: ${correct}\n❌ Sbagliate: ${wrong}\n⏱ Tempo medio: ${avgTime} ms`
-      );
+      //Alert.alert(
+       // 'Gioco terminato!',
+       // `🎯 Tentativi: ${allResults.length}\n✅ Corrette: ${correct}\n❌ Sbagliate: ${wrong}\n⏱ Tempo medio: ${avgTime} ms`
+      //);
+      router.push({ pathname: '/games/EndGame', params: { gameName: 'minigame1' } });
 
       setShowEndScreen(true);
       setGameEnded(false); // Resetto lo stato

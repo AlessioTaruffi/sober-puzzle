@@ -129,7 +129,6 @@ const handleSubmit = () => {
       correct: correctFoodCount,
     },
   });
-  console.log('eccomi qua');
   router.push({pathname: './EndGame', params: { gameName: 'minigameConta', }});
   
 };

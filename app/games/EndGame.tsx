@@ -24,8 +24,7 @@ export default function EndScreen(){
   const gameName = typeof params.gameName === 'string' ? params.gameName : '';
 
   const nextGameRoute = gamesList[gamesList.indexOf(`/games/${gameName}`) + 1] || '/'; // Default to home if no next game
-  console.log('nextGameRoute:', nextGameRoute);
-  console.log('params:', gameName,nextGameRoute);
+
 
   const { results } = useGameScore();
   const router = useRouter();
