@@ -3,12 +3,11 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
-  Modal,
   Pressable,
   StyleSheet,
   Text,
   Vibration,
-  View,
+  View
 } from "react-native";
 import { useGameScore } from "./GameScoreContext";
 import { gamesList } from "./gamesList";
@@ -58,6 +57,7 @@ export default function App() {
     setGameOver(true);
     setShowModal(true);
     stopVibrationAndStack();
+    router.push({ pathname: '/games/EndGame', params: { gameName: 'minigameTorre' } });
   }, []);
 
   const resetGame = useCallback(() => {
@@ -192,7 +192,7 @@ export default function App() {
       <Text></Text>
     </Pressable>
 
-
+      {/*}
       <Modal visible={showModal} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
@@ -203,7 +203,9 @@ export default function App() {
           </View>
         </View>
       </Modal>
+      */}
     </View>
+    
   );
 }
 

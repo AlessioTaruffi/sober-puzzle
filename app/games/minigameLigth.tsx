@@ -3,7 +3,6 @@ import { useRouter } from 'expo-router';
 import { Accelerometer } from 'expo-sensors';
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  Alert,
   Button,
   StyleSheet,
   Text,
@@ -124,9 +123,7 @@ export default function App() {
       : 'N/A';
 
     setGameEnd(true);
-
-    
-
+    /*
     Alert.alert(
       '⏰ Tempo scaduto!',
       `Media tempi di reazione: ${media === 'N/A' ? media : media + ' ms'}`,
@@ -137,7 +134,13 @@ export default function App() {
           style: 'default',
         },
       ]
-    );
+    );*/
+    const result = {
+      name: 'Minigame Light',
+      reactionTime: media	
+    }
+    addResult.addResult('minigameLight', result);
+    router.push({ pathname: '/games/EndGame', params: { gameName: 'minigameLight' } });
   };
 
   useEffect(() => {
@@ -147,11 +150,7 @@ export default function App() {
       ? (reactionTimes.current.reduce((a, b) => a + b) / reactionTimes.current.length).toFixed(0)
       : 'N/A';
 
-    const result = {
-      name: 'Minigame Light',
-      reactionTime: media	
-    }
-    addResult.addResult('minigameLight', result);
+
     setGameEnd(false);
   }, [gameEnd]);
 

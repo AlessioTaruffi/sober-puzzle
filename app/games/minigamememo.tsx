@@ -76,8 +76,10 @@ const GameScreen = () => {
                 name: "Minigame Memo",
                 maxRound: maxRound,
             };
-            addResult.addResult("minigameMemo", result);
+            addResult.addResult("minigamememo", result);
+            router.push({ pathname: '/games/EndGame', params: { gameName: 'minigamememo' } });
 
+            /*
             Alert.alert(
             'Tempo scaduto',
             `Round massimo: ${maxRound}`,
@@ -87,7 +89,7 @@ const GameScreen = () => {
                     router.push(nextGame as any); //vai al prossimo gioco
                 }
             }]
-            );
+            );*/
         }
     }, [timeLeft, maxRound]);
 

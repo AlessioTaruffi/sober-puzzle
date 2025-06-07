@@ -163,7 +163,7 @@ export default function minigame1() {
       //);
       router.push({ pathname: '/games/EndGame', params: { gameName: 'minigame1' } });
 
-      setShowEndScreen(true);
+      //setShowEndScreen(true);
       setGameEnded(false); // Resetto lo stato
     }
   }, [gameEnded]);

@@ -27,11 +27,37 @@ export const renderers: Record<string, Renderer> = {
   ),
   "minigame1": (data) => (
     <View>
-      <Text>Tempo di reazione medio: {data.averageReactionTime} ms</Text>
-      <Text>Colore attivo: {data.activeColor}</Text>
-      <Text>Colore corretto: {data.correctColor}</Text>
-      <Text>Colore sbagliato: {data.wrongColor}</Text>
-      <Text>Numero di click: {data.clickCount}</Text>
+      <Text>Tentativi: {data.attempts}</Text>
+      <Text>Corrette: {data.correct}</Text>
+      <Text>Errate: {data.wrong}</Text>
+      <Text>AVG reaction time: {data.avgTime}s</Text>
+    </View>
+  ),
+  "minigame2": (data) => (	
+    
+    <View>
+      <Text>Tempo di equilibrio: {data.balanceTime}s</Text>
+    </View>
+  ),
+  "minigamegolf": (data) => (
+    <View>
+      <Text>Tentativi: {data.tries}</Text>
+      <Text>Outcome: {data.outcome}</Text>
+    </View>
+  ),
+  "minigamememo": (data) => (
+    <View>
+      <Text>Round massimo: {data.maxRound}</Text>
+    </View>
+  ),
+  "minigameTorre": (data) => (
+    <View>
+      <Text>Gioco dimmerda</Text>
+    </View>
+  ),
+  "minigameLigth": (data) => (
+    <View>
+      <Text>AVG Reaction Time: {data.reactionTime}s</Text>
     </View>
   ),
 };

@@ -1,7 +1,8 @@
+import { Text } from "@react-navigation/elements";
 import { useRouter } from "expo-router";
 import { Gyroscope } from 'expo-sensors';
 import { useEffect, useRef, useState } from 'react';
-import { Button, Dimensions, StyleSheet, Text, Vibration, View } from "react-native";
+import { Dimensions, StyleSheet, Vibration, View } from "react-native";
 import Svg, { Path } from 'react-native-svg';
 import { useGameScore } from "./GameScoreContext";
 import { gamesList } from "./gamesList";
@@ -261,7 +262,7 @@ export default function MinigameGolf() {
                         setHasLost(true);
                     } else {
                         // Reset della pallina alla posizione iniziale
-                        newTop = 50;
+                        newTop = 50 + 100;
                         newLeft = pathOffsetX - 12.5;
                         velocityRef.current.vx = 0;
                         velocityRef.current.vy = 0;
@@ -294,7 +295,8 @@ export default function MinigameGolf() {
                 tries: 3 - tries,
                 outcome: 'won',
             };
-            addResult.addResult('minigameGolf', result);
+            addResult.addResult('minigamegolf', result);
+            router.push({ pathname: '/games/EndGame', params: { gameName: 'minigamegolf' } });
         }
     }, [hasWon]);
 
@@ -305,7 +307,8 @@ export default function MinigameGolf() {
                 tries: 3 - tries,
                 outcome: 'lost',
             };
-            addResult.addResult('minigameGolf', result);
+            addResult.addResult('minigamegolf', result);
+            router.push({ pathname: '/games/EndGame', params: { gameName: 'minigamegolf' } });
         }
     }, [hasLost]);
 
@@ -351,20 +354,31 @@ export default function MinigameGolf() {
             {/* Pallina */}
             <View style={[styles.ball, { top: ballPosition.top, left: ballPosition.left }]} />
 
-            {/* Messaggi */}
+            {(isCalibrating) && (
+                <View style={styles.message}>
+                    <Text style={styles.winText}>Calibrazione...</Text>
+                </View>
+            )}
+
+            {/* Messaggi di vittoria o sconfitta */}
+            
+
+            {/* Messaggi vecchi
             {(hasWon || hasLost || isCalibrating) && (
-        <View style={styles.overlay}>
-            <View style={styles.messageBox}>
-            {hasWon && 
-            <View>
-                <Text style={styles.winText}>🏆 Hai vinto!</Text>
-                <Button title="Prossimo gioco" onPress={() => router.push(nextGame as any)} />
-            </View>}
-            {hasLost && <Text style={[styles.winText, { color: 'red' }]}>💀 Hai perso!</Text>}
-            {isCalibrating && <Text style={[styles.winText, { color: 'orange' }]}>⏳ Calibrazione...</Text>}
+            <View style={styles.overlay}>
+                <View style={styles.messageBox}>
+                {/* vecchio codice con schermate
+                    {hasWon && 
+                        <View>
+                            <Text style={styles.winText}>🏆 Hai vinto!</Text>
+                            <Button title="Prossimo gioco" onPress={() => router.push(nextGame as any)} />
+                        </View>}
+                    {hasLost && <Text style={[styles.winText, { color: 'red' }]}>💀 Hai perso!</Text>}
+                
+                    {isCalibrating && <Text style={[styles.winText, { color: 'orange' }]}>⏳ Calibrazione...</Text>}
+                </View>
             </View>
-        </View>
-        )}
+            )*/}
         </View>
     );
 }

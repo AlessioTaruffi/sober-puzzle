@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
 import { Gyroscope, GyroscopeMeasurement } from 'expo-sensors';
 import { useEffect, useState } from 'react';
-import { Button, StyleSheet, Text, Vibration, View } from "react-native";
+import { StyleSheet, Text, Vibration, View } from "react-native";
 import { gamesList } from "./gamesList";
 
 import { useGameScore } from "./GameScoreContext";
@@ -77,6 +77,7 @@ export default function minigame2() {
         balanceTime: truncateTo3Decimals(balanceTime),
       };
       addResult.addResult('minigame2', result);
+      router.push({ pathname: '/games/EndGame', params: { gameName: 'minigame2' } });
     }
   }, [gameOver]);
 
@@ -150,7 +151,7 @@ const checkBalance = (shouldVibrate = true): boolean => {
       <Text style={styles.text}>y: {truncateTo3Decimals(y)}</Text>
       <Text style={styles.text}>z: {truncateTo3Decimals(z)}</Text>
 
-      {gameOver && (
+      {/*gameOver && (
         <View style={styles.results}>
           <Text style={styles.text}>Test completato!</Text>
           <Text style={styles.text}>Tempo stabile: {truncateTo3Decimals(balanceTime)} secondi</Text>
@@ -158,7 +159,7 @@ const checkBalance = (shouldVibrate = true): boolean => {
             () => {router.push(nextGame as any)}
           } />
         </View>
-      )}
+      )*/}
 
     </View>
   )
