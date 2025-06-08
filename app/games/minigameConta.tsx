@@ -1,9 +1,6 @@
 import Slider from '@react-native-community/slider';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-
-
-
 import {
   Animated,
   Dimensions,
@@ -14,13 +11,7 @@ import {
   View
 } from 'react-native';
 import { useGameScore } from './GameScoreContext'; // Assicurati che il percorso sia corretto
-import { gamesList } from './gamesList';
-
 const { width, height } = Dimensions.get('window');
-
-
-const currentGameIndex = gamesList.indexOf('/games/minigameConta');
-const nextGameRoute = gamesList[currentGameIndex + 1];
 const GAME_AREA_WIDTH = width * 0.9;
 const GAME_AREA_HEIGHT = height * 0.8;
 
@@ -132,8 +123,6 @@ const handleSubmit = () => {
   router.push({pathname: './EndGame', params: { gameName: 'minigameConta', }});
   
 };
-
-
 
   if (!isReady || navigating) {
   return <Text>Loading...</Text>;

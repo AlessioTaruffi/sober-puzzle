@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from 'react';
 import { Dimensions, StyleSheet, Vibration, View } from "react-native";
 import Svg, { Path } from 'react-native-svg';
 import { useGameScore } from "./GameScoreContext";
-import { gamesList } from "./gamesList";
 
 export default function MinigameGolf() {
 
@@ -14,16 +13,10 @@ export default function MinigameGolf() {
     //Dimensioni dello schermo 
     const SCREEN_WIDTH = Dimensions.get("window").width;
     const SCREEN_HEIGHT = Dimensions.get("window").height;
-
     const [gyroBias, setGyroBias] = useState({ x: 0, y: 0 });
     const [isCalibrating, setIsCalibrating] = useState(true);
-
     const [tries, setTries] = useState(2); // Numero di tentativi
-
     const router = useRouter();
-    const currentGame = "/games/minigamegolf";
-    const currentIndex = gamesList.indexOf(currentGame);
-    const nextGame = gamesList[currentIndex + 1] 
 
     const calibrateGyroscope = async () => {
         setIsCalibrating(true);
@@ -57,8 +50,6 @@ export default function MinigameGolf() {
 
     //stato del giroscopio
     const [{ x, y }, setGyroData] = useState({ x: 0, y: 0, z: 0 });
-
-    const maxY = SCREEN_HEIGHT - 100; // margine per buca e UI
 
     //spostamento orizzontale per centrare il percorso
     const pathOffsetX = SCREEN_WIDTH / 3;
@@ -359,26 +350,6 @@ export default function MinigameGolf() {
                     <Text style={styles.winText}>Calibrazione...</Text>
                 </View>
             )}
-
-            {/* Messaggi di vittoria o sconfitta */}
-            
-
-            {/* Messaggi vecchi
-            {(hasWon || hasLost || isCalibrating) && (
-            <View style={styles.overlay}>
-                <View style={styles.messageBox}>
-                {/* vecchio codice con schermate
-                    {hasWon && 
-                        <View>
-                            <Text style={styles.winText}>🏆 Hai vinto!</Text>
-                            <Button title="Prossimo gioco" onPress={() => router.push(nextGame as any)} />
-                        </View>}
-                    {hasLost && <Text style={[styles.winText, { color: 'red' }]}>💀 Hai perso!</Text>}
-                
-                    {isCalibrating && <Text style={[styles.winText, { color: 'orange' }]}>⏳ Calibrazione...</Text>}
-                </View>
-            </View>
-            )*/}
         </View>
     );
 }

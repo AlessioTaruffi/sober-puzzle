@@ -10,30 +10,21 @@ import {
   View
 } from 'react-native';
 import { useGameScore } from "./GameScoreContext";
-import { gamesList } from './gamesList';
 
 export default function App() {
 
   const addResult = useGameScore();
-
   const router = useRouter();
-  const currentGame = "/games/minigameLight";
-  const currentIndex = gamesList.indexOf(currentGame);
-  const nextGame = gamesList[currentIndex + 1] 
-
   const [facing, setFacing] = useState<CameraType>('back');
   const [permission, requestPermission] = useCameraPermissions();
   const [torchEnabled, setTorchEnabled] = useState(false);
   const [timer, setTimer] = useState(20);
-
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const torchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-
   const torchStartTime = useRef<number | null>(null);
   const reactionTimes = useRef<number[]>([]);
   const [subscription, setSubscription] = useState<any>(null);
   const [gameEnd, setGameEnd] = useState(false);
-
   const torchEnabledRef = useRef(false); // NEW
 
   useEffect(() => {
@@ -123,18 +114,7 @@ export default function App() {
       : 'N/A';
 
     setGameEnd(true);
-    /*
-    Alert.alert(
-      '⏰ Tempo scaduto!',
-      `Media tempi di reazione: ${media === 'N/A' ? media : media + ' ms'}`,
-      [
-        {
-          text: 'Prossimo gioco',
-          onPress: () => router.push(nextGame as any),
-          style: 'default',
-        },
-      ]
-    );*/
+
     const result = {
       name: 'Minigame Light',
       reactionTime: media	
@@ -150,23 +130,8 @@ export default function App() {
       ? (reactionTimes.current.reduce((a, b) => a + b) / reactionTimes.current.length).toFixed(0)
       : 'N/A';
 
-
     setGameEnd(false);
   }, [gameEnd]);
-
-
-  const toggleTorch = () => {
-    setTorchEnabled(prev => {
-      const newValue = !prev;
-      torchEnabledRef.current = newValue;
-      return newValue;
-    });
-  };
-
-  const restartTimer = () => {
-    reactionTimes.current = [];
-    startTimer();
-  };
 
   if (!permission) return <View />;
   if (!permission.granted) {

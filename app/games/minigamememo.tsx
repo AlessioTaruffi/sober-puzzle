@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import FlipCard from './flipcard';
 import { useGameScore } from "./GameScoreContext";
-import { gamesList } from "./gamesList";
 
 //definizione di un tipo per i dati delle carte
 //in questo caso, ogni carta ha un id, uno stato di rivelazione e uno stato di selezione
@@ -22,15 +21,7 @@ type CardData = {
 //grandezza della gliglia
 const GRID_SIZE = 5;
 const CARD_COUNT = GRID_SIZE * GRID_SIZE;
-//const MAX_ROUND = 10;
-
-
-
 const router = useRouter();
-const currentGame = "/games/minigamememo";
-const currentIndex = gamesList.indexOf(currentGame);
-const nextGame = gamesList[currentIndex + 1] 
-
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const CARD_MARGIN = 5;
 const CARD_SIZE = (SCREEN_WIDTH - CARD_MARGIN * 2 * GRID_SIZE - 40) / GRID_SIZE; //grandezza della carta
@@ -79,17 +70,6 @@ const GameScreen = () => {
             addResult.addResult("minigamememo", result);
             router.push({ pathname: '/games/EndGame', params: { gameName: 'minigamememo' } });
 
-            /*
-            Alert.alert(
-            'Tempo scaduto',
-            `Round massimo: ${maxRound}`,
-            [{
-                text: 'Prossimo gioco',
-                onPress: () => {
-                    router.push(nextGame as any); //vai al prossimo gioco
-                }
-            }]
-            );*/
         }
     }, [timeLeft, maxRound]);
 
@@ -184,30 +164,6 @@ const GameScreen = () => {
         }
     };
 
-
-    //funzione chiamata quando l'utente preme il pulsante di verifica
-    //controlla se l'utente ha selezionato le carte giuste
-    //se ha selezionato tutte le carte giuste mostra un messaggio di vittoria
-    //NON PIÚ IN USO
-    const checkResult = () => {
-        const success = cards.every((card, i) => {
-            return (
-                (targetIndices.includes(i) && card.selected) ||
-                (!targetIndices.includes(i) && !card.selected)
-            );
-        });
-
-        if (success) {
-        Alert.alert('Daje cosi', 'Tutte giuste', [
-            { text: 'Avanti', onPress: () => setRound((r) => r + 1) },
-        ]);
-        } else {
-        Alert.alert('Che sola', 'Hai toppato', [
-            { text: 'Riprova', onPress: () => setRound(1) },
-        ]);
-        }
-    };
-
     return (
         <View style={styles.container}>
             <Text style={styles.timerText}>Tempo rimasto: {timeLeft}s</Text>
@@ -222,13 +178,6 @@ const GameScreen = () => {
                     />
                 ))}
             </View>
-            {/* vecchio codice per il bottone di verifica, ora la verifica é automatica
-            {!isShowing && (
-                <TouchableOpacity style={styles.button} onPress={checkResult}>
-                    <Text style={styles.buttonText}>Verifica</Text>
-                </TouchableOpacity>
-            )}
-            */}
         </View>
     );
 };

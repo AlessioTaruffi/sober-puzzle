@@ -2,7 +2,6 @@ import { useRouter } from "expo-router";
 import { Gyroscope, GyroscopeMeasurement } from 'expo-sensors';
 import { useEffect, useState } from 'react';
 import { StyleSheet, Text, Vibration, View } from "react-native";
-import { gamesList } from "./gamesList";
 
 import { useGameScore } from "./GameScoreContext";
 
@@ -16,13 +15,7 @@ export default function minigame2() {
   });
 
   const router = useRouter();
-  const currentGame = "/games/minigame2";
-  const currentIndex = gamesList.indexOf(currentGame);
-  const nextGame = gamesList[currentIndex + 1] 
-
   const addResult = useGameScore();
-  
-
 
   //sottoscrizione del listener al giroscopio
   const [subscription, setSubscription] = useState<ReturnType<typeof Gyroscope.addListener> | null>(null);
@@ -57,14 +50,6 @@ export default function minigame2() {
   const [timer, setTimer] = useState<number>(20); //timer di 20 secondi
   const [balanceTime, setBalanceTime] = useState<number>(0); //tempo totale in cui è stato stabile
   const [gameOver, setGameOver] = useState<boolean>(false); //se il gioco è finito
-
-  const saveResult = () => {
-    const result = {
-      name: 'Minigame 2',
-      balanceTime: truncateTo3Decimals(balanceTime),
-    }
-    addResult.addResult('minigame2', result);
-  }
 
   //quando il gioco finisce, salva il risultato
   //e lo aggiunge al contesto dei risultati
@@ -150,16 +135,6 @@ const checkBalance = (shouldVibrate = true): boolean => {
       <Text style={styles.text}>x: {truncateTo3Decimals(x)}</Text>
       <Text style={styles.text}>y: {truncateTo3Decimals(y)}</Text>
       <Text style={styles.text}>z: {truncateTo3Decimals(z)}</Text>
-
-      {/*gameOver && (
-        <View style={styles.results}>
-          <Text style={styles.text}>Test completato!</Text>
-          <Text style={styles.text}>Tempo stabile: {truncateTo3Decimals(balanceTime)} secondi</Text>
-          <Button title="Prossimo minigioco" onPress={
-            () => {router.push(nextGame as any)}
-          } />
-        </View>
-      )*/}
 
     </View>
   )

@@ -6,7 +6,6 @@ import { useGameScore } from "./GameScoreContext";
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  Dimensions,
   TouchableOpacity,
   Vibration
 } from 'react-native';
@@ -17,8 +16,6 @@ const COLORS = ['red', 'blue', 'green', 'yellow', 'purple', 'orange'];
 export default function minigame1() {
 
   const addResult = useGameScore();
-
-  const screenWidth = Dimensions.get('window').width;
   const shakeAnim = useRef(new Animated.Value(0)).current; //animazione per shake
 
   //funzione che gestisce l'animazione di shake
