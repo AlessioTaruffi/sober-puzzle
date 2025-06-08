@@ -85,7 +85,7 @@ export default function App() {
     const sub = Accelerometer.addListener(accelerometerData => {
       const { x, y, z } = accelerometerData;
       const total = Math.abs(x) + Math.abs(y) + Math.abs(z);
-      if (total > 2 && torchEnabledRef.current) {
+      if (total > 1.7 && torchEnabledRef.current) { //1.7 è un valore empirico per rilevare una scossa
         handleShakeDetected();
       }
     });

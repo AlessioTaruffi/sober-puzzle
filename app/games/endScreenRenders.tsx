@@ -60,4 +60,14 @@ export const renderers: Record<string, Renderer> = {
       <Text>AVG Reaction Time: {data.reactionTime}s</Text>
     </View>
   ),
+  "holdsteady": (data) => (
+    <View>
+      <Text>Numero di round: {data.targetRounds}</Text>
+      {data.results.map((res: {round: number; reactionTime: number; holdDuration: number; result: string }) => (
+        <Text key={res.round}>
+          Round {res.round}: RT {res.reactionTime} ms | Hold {res.holdDuration} ms | {res.result}
+        </Text>
+      ))}
+    </View>
+  ),
 };
