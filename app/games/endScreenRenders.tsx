@@ -1,12 +1,14 @@
 // endScreenRenderers.ts
 import React from 'react';
-import { Text, View } from 'react-native';
-
-
+import { Image, Text, View } from 'react-native';
 export type GameSpecificData = Record<string, any>;
 
 type Renderer = (data: GameSpecificData) => React.ReactElement;
-
+const badgeImages = {
+  Stabile: require('../../assets/images/Mentestabile.png'),
+  Variabile: require('../../assets/images/Variabile.png'),
+  Instabile: require('../../assets/images/Instabile.png'),
+};
 
 
 export const renderers: Record<string, Renderer> = {
@@ -70,4 +72,85 @@ export const renderers: Record<string, Renderer> = {
       ))}
     </View>
   ),
+  "final": (results: Record<string, any>) => {
+  let passedChecks = 0;
+  let totalChecks = 0;
+
+  const check = (condition: boolean) => {
+    totalChecks++;
+    if (condition) passedChecks++;
+  };
+
+  // 🏌️‍♂️ Golf: max 2 tries
+  if (results.minigamegolf?.tries !== undefined) {
+    check(results.minigamegolf.tries <= 2);
+  }
+
+  // 🍺 Conta: massimo 1 errore su 3 categorie
+  if (results.minigameConta) {
+    const errCount =
+      (results.minigameConta.beers.user !== results.minigameConta.beers.correct ? 1 : 0) +
+      (results.minigameConta.water.user !== results.minigameConta.water.correct ? 1 : 0) +
+      (results.minigameConta.food.user !== results.minigameConta.food.correct ? 1 : 0);
+    check(errCount <= 1);
+  }
+
+  // ⚡ Reaction Game: minigame1
+  if (results.minigame1) {
+    const correct = results.minigame1.correct || 0;
+    const attempts = results.minigame1.attempts || 1;
+    const avgTime = results.minigame1.avgTime || 99;
+    const accuracy = correct / attempts;
+    check(avgTime <= 1.0 && accuracy >= 0.7);
+  }
+
+  // 🧘 Equilibrio: minigame2
+  if (results.minigame2?.balanceTime !== undefined) {
+    check(results.minigame2.balanceTime > 5);
+  }
+
+  // 🧠 Memoria: minigamememo
+  if (results.minigamememo?.maxRound !== undefined) {
+    check(results.minigamememo.maxRound >= 4);
+  }
+
+  // ⚡ Riflessi: minigameLigth
+  if (results.minigameLigth?.reactionTime !== undefined) {
+    check(results.minigameLigth.reactionTime <= 0.6);
+  }
+
+  // 🎯 HoldSteady: almeno 70% successi
+  if (results.holdsteady?.results) {
+    const totalRounds = results.holdsteady.results.length;
+    const successCount = results.holdsteady.results.filter(
+      (r: any) => r.result?.toLowerCase() === 'success'
+    ).length;
+    check((successCount / totalRounds) >= 0.7);
+  }
+
+  const stabilityPercent = totalChecks ? (passedChecks / totalChecks) * 100 : 0;
+  const stabilityLabel = stabilityPercent >= 80
+    ? 'Stabile'
+    : stabilityPercent >= 50
+    ? 'Variabile'
+    : 'Instabile';
+
+  return (
+    <View>
+      <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 10 }}>
+        🧠 Riepilogo Finale
+      </Text>
+      <Text>🔍 Stabilità calcolata: {stabilityPercent.toFixed(1)}%</Text>
+      <Text>📊 Classificazione: {stabilityLabel}</Text>
+      <Text style={{ marginTop: 10 }}>Giochi valutati: {totalChecks}</Text>
+
+    <Image
+      source={badgeImages[stabilityLabel]}
+      style={{ width: 150, height: 150, alignSelf: 'center', marginTop: 20 }}
+      resizeMode="contain"
+    />
+    </View>
+  );
+}
+
 };

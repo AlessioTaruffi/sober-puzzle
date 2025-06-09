@@ -29,9 +29,10 @@ export default function EndScreen(){
   const { results } = useGameScore();
   const router = useRouter();
 
-  const data = results[gameName];
+  const data = gameName === "final" ? results : results[gameName];
   const Renderer = renderers[gameName];
   console.log('data:', data);
+  const PressText = nextGameRoute === "final" ? "Fine del gioco" : "Prossimo gioco";
 
   return (
     <GameScoreProvider>
@@ -54,9 +55,20 @@ export default function EndScreen(){
           padding: 10,
           borderRadius: 8,
         }}
-        onPress={() => router.push(nextGameRoute as any)}
+        onPress={() => {
+              if (nextGameRoute === "final") {
+                router.push({ pathname: "./EndGame", params: { gameName: "final" } });
+              } else if (gameName === "final") {
+                 router.push('/');
+              }
+              else {
+               router.push(nextGameRoute as any); // Redirect to home if no next game
+              }
+            }}
+
+
       >
-        <Text style={{ color: "white", textAlign: "center" }}>Prossimo gioco</Text>
+        <Text style={{ color: "white", textAlign: "center" }}>{PressText}</Text>
       </TouchableOpacity>
     </View>
     </GameScoreProvider>

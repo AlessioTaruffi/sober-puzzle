@@ -1,5 +1,4 @@
 export const gamesList = [
-  "/games/minigameConta",
   "/games/holdsteady",
   "/games/minigame1",
   "/games/minigame2",
@@ -7,5 +6,6 @@ export const gamesList = [
   "/games/minigamememo",
   "/games/minigameTorre",
   "/games/minigameLigth",
-  "/games/minigameConta"
+  "/games/minigameConta",
+  "final"
 ];
