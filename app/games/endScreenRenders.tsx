@@ -1,6 +1,6 @@
 // endScreenRenderers.ts
 import React from 'react';
-import { Image, Text, View } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
 export type GameSpecificData = Record<string, any>;
 
 type Renderer = (data: GameSpecificData) => React.ReactElement;
@@ -13,65 +13,93 @@ const badgeImages = {
 
 export const renderers: Record<string, Renderer> = {
   "minigameConta": (data) => (
-   <View>
-  <Text>🍺 Birre viste: {data.beers.user} / corrette: {data.beers.correct}</Text>
-  <Text>💧 Acque viste: {data.water.user} / corrette: {data.water.correct}</Text>
-  <Text>🍽️ Cibo visto: {data.food.user} / corrette: {data.food.correct}</Text>
+  <View style={styles.container}>
+    <Text style={styles.title}>🍽️ Conta Oggetti</Text>
+    <View style={styles.metricRow}>
+      <Text style={styles.label}>Birre viste:</Text>
+      <Text style={styles.value}>{data.beers.user} / {data.beers.correct}</Text>
+    </View>
+    <View style={styles.metricRow}>
+      <Text style={styles.label}>Acque viste:</Text>
+      <Text style={styles.value}>{data.water.user} / {data.water.correct}</Text>
+    </View>
+    <View style={styles.metricRow}>
+      <Text style={styles.label}>Cibi visti:</Text>
+      <Text style={styles.value}>{data.food.user} / {data.food.correct}</Text>
+    </View>
+    <Text style={[styles.feedback, {
+      color: (data.beers.user === data.beers.correct &&
+              data.water.user === data.water.correct &&
+              data.food.user === data.food.correct) ? 'green' : 'red'
+    }]}>
+      {(data.beers.user === data.beers.correct &&
+        data.water.user === data.water.correct &&
+        data.food.user === data.food.correct)
+        ? 'Tutto corretto! 🎉'
+        : 'Qualcosa non torna... 😕'}
+    </Text>
+  </View>
+),
 
-  {
-    (data.beers.user === data.beers.correct &&
-     data.water.user === data.water.correct &&
-     data.food.user === data.food.correct)
-      ? <Text style={{ color: 'green', fontWeight: 'bold' }}>Tutto corretto! 🎉</Text>
-      : <Text style={{ color: 'red', fontWeight: 'bold' }}>Qualcosa non torna... 😕</Text>
-  }
-</View>
-  ),
-  "minigame1": (data) => (
-    <View>
-      <Text>Tentativi: {data.attempts}</Text>
-      <Text>Corrette: {data.correct}</Text>
-      <Text>Errate: {data.wrong}</Text>
-      <Text>AVG reaction time: {data.avgTime}s</Text>
-    </View>
-  ),
-  "minigame2": (data) => (	
-    
-    <View>
-      <Text>Tempo di equilibrio: {data.balanceTime}s</Text>
-    </View>
-  ),
-  "minigamegolf": (data) => (
-    <View>
-      <Text>Tentativi: {data.tries}</Text>
-      <Text>Outcome: {data.outcome}</Text>
-    </View>
-  ),
-  "minigamememo": (data) => (
-    <View>
-      <Text>Round massimo: {data.maxRound}</Text>
-    </View>
-  ),
-  "minigameTorre": (data) => (
-    <View>
-      <Text>Gioco dimmerda</Text>
-    </View>
-  ),
-  "minigameLigth": (data) => (
-    <View>
-      <Text>AVG Reaction Time: {data.reactionTime}s</Text>
-    </View>
-  ),
-  "holdsteady": (data) => (
-    <View>
-      <Text>Numero di round: {data.targetRounds}</Text>
-      {data.results.map((res: {round: number; reactionTime: number; holdDuration: number; result: string }) => (
-        <Text key={res.round}>
-          Round {res.round}: RT {res.reactionTime} ms | Hold {res.holdDuration} ms | {res.result}
-        </Text>
-      ))}
-    </View>
-  ),
+"minigame1": (data) => (
+  <View style={styles.container}>
+    <Text style={styles.title}>⚡ Reazione</Text>
+    <View style={styles.metricRow}><Text style={styles.label}>Tentativi:</Text><Text style={styles.value}>{data.attempts}</Text></View>
+    <View style={styles.metricRow}><Text style={styles.label}>Corrette:</Text><Text style={styles.value}>{data.correct}</Text></View>
+    <View style={styles.metricRow}><Text style={styles.label}>Errate:</Text><Text style={styles.value}>{data.wrong}</Text></View>
+    <View style={styles.metricRow}><Text style={styles.label}>Tempo medio:</Text><Text style={styles.value}>{data.avgTime}s</Text></View>
+  </View>
+),
+
+"minigame2": (data) => (
+  <View style={styles.container}>
+    <Text style={styles.title}>🧘 Equilibrio</Text>
+    <View style={styles.metricRow}><Text style={styles.label}>Tempo equilibrio:</Text><Text style={styles.value}>{data.balanceTime}s</Text></View>
+  </View>
+),
+
+"minigamegolf": (data) => (
+  <View style={styles.container}>
+    <Text style={styles.title}>🏌️ Mini Golf</Text>
+    <View style={styles.metricRow}><Text style={styles.label}>Tentativi:</Text><Text style={styles.value}>{data.tries}</Text></View>
+    <View style={styles.metricRow}><Text style={styles.label}>Esito:</Text><Text style={styles.value}>{data.outcome}</Text></View>
+  </View>
+),
+
+"minigamememo": (data) => (
+  <View style={styles.container}>
+    <Text style={styles.title}>🧠 Memoria</Text>
+    <View style={styles.metricRow}><Text style={styles.label}>Round massimo:</Text><Text style={styles.value}>{data.maxRound}</Text></View>
+  </View>
+),
+
+"minigameTorre": () => (
+  <View style={styles.container}>
+    <Text style={styles.title}>🧱 Torre</Text>
+    <Text style={styles.feedback}>Gioco in fase sperimentale</Text>
+  </View>
+),
+
+"minigameLigth": (data) => (
+  <View style={styles.container}>
+    <Text style={styles.title}>⚡ Riflessi</Text>
+    <View style={styles.metricRow}><Text style={styles.label}>Tempo medio:</Text><Text style={styles.value}>{data.reactionTime}s</Text></View>
+  </View>
+),
+
+"holdsteady": (data) => (
+  <View style={styles.container}>
+    <Text style={styles.title}>🎯 Hold Steady</Text>
+    <View style={styles.metricRow}><Text style={styles.label}>Round previsti:</Text><Text style={styles.value}>{data.targetRounds}</Text></View>
+    {data.results.map((res: any) => (
+      <View key={res.round} style={styles.metricRow}>
+        <Text style={styles.label}>Round {res.round}:</Text>
+        <Text style={styles.value}>RT {res.reactionTime} ms | Hold {res.holdDuration} ms | {res.result}</Text>
+      </View>
+    ))}
+  </View>
+),
+
   "final": (results: Record<string, any>) => {
   let passedChecks = 0;
   let totalChecks = 0;
@@ -135,22 +163,107 @@ export const renderers: Record<string, Renderer> = {
     ? 'Variabile'
     : 'Instabile';
 
-  return (
-    <View>
-      <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 10 }}>
-        🧠 Riepilogo Finale
-      </Text>
-      <Text>🔍 Stabilità calcolata: {stabilityPercent.toFixed(1)}%</Text>
-      <Text>📊 Classificazione: {stabilityLabel}</Text>
-      <Text style={{ marginTop: 10 }}>Giochi valutati: {totalChecks}</Text>
+  const badgePhrase = {
+    Stabile: '🧊 Mente lucida e stabile!',
+    Variabile: '🌀 Alcuni segnali di variabilità',
+    Instabile: '🔥 Instabilità significativa',
+  }[stabilityLabel];
 
-    <Image
-      source={badgeImages[stabilityLabel]}
-      style={{ width: 150, height: 150, alignSelf: 'center', marginTop: 20 }}
-      resizeMode="contain"
-    />
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>🧠 Riepilogo Finale</Text>
+      
+      <View style={styles.metricRow}>
+        <Text style={styles.label}>🔍 Stabilità calcolata:</Text>
+        <Text style={styles.value}>{stabilityPercent.toFixed(1)}%</Text>
+      </View>
+
+      <View style={styles.metricRow}>
+        <Text style={styles.label}>📊 Classificazione:</Text>
+        <Text style={styles.value}>{stabilityLabel}</Text>
+      </View>
+
+      <Text style={styles.subtext}>Giochi valutati: {totalChecks}</Text>
+
+      <Image
+        source={badgeImages[stabilityLabel]}
+        style={styles.badge}
+        resizeMode="contain"
+      />
+
+      <Text style={styles.badgeText}>{badgePhrase}</Text>
     </View>
   );
 }
-
 };
+export const styles = StyleSheet.create({
+  container: {
+    padding: 20,
+    borderRadius: 16,
+    backgroundColor: '#ffffff',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    marginVertical: 12,
+    marginHorizontal: 16,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#2c2c2e',
+    marginBottom: 16,
+  },
+  metricRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e6e6e6',
+  },
+  label: {
+    fontSize: 16,
+    color: '#6b6b6b',
+    fontWeight: '500',
+  },
+  value: {
+    fontSize: 16,
+    color: '#1c1c1e',
+    fontWeight: '600',
+  },
+  feedback: {
+    fontSize: 16,
+    marginTop: 14,
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+  badge: {
+    width: 160,
+    height: 160,
+    marginTop: 24,
+    alignSelf: 'center',
+  },
+  badgeText: {
+    marginTop: 12,
+    fontSize: 16,
+    fontStyle: 'italic',
+    color: '#444',
+    textAlign: 'center',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#e0e0e0',
+    marginVertical: 12,
+  },
+  highlight: {
+    color: '#007AFF', // iOS Material Blue
+    fontWeight: 'bold',
+  },
+  subtext: {
+    marginTop: 12,
+    fontSize: 14,
+    color: '#888',
+  },
+});
+
