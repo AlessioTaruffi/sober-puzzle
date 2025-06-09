@@ -1,3 +1,4 @@
+import { useAudioPlayer } from 'expo-audio';
 import { useRouter } from "expo-router";
 import { Gyroscope, GyroscopeMeasurement } from 'expo-sensors';
 import { useEffect, useRef, useState } from 'react';
@@ -6,6 +7,10 @@ import { StyleSheet, Text, Vibration, View } from "react-native";
 import { useGameScore } from "./GameScoreContext";
 
 export default function minigame2() {
+
+
+  const audioSource = require('../../assets/audio/count.mp3');
+  const player = useAudioPlayer(audioSource);
 
   //stato per i valori del giroscopio
   const [{ x, y, z }, setData] = useState({
@@ -32,6 +37,10 @@ export default function minigame2() {
             setShowModal(false);
             setGameStarted(true); // inizia il gioco!
             return 0;
+          }
+          if(prev <= 5) {
+            player.seekTo(0);
+            player.play();
           }
           return prev - 1;
         });
@@ -84,12 +93,16 @@ export default function minigame2() {
   //cosí che sia fuori dal rendere e react non si incazzi
   useEffect(() => {
     if (gameOver) {
+      player.seekTo(0);
+      player.play();
       const result = {
         name: 'Minigame 2',
         balanceTime: truncateTo3Decimals(balanceTime),
       };
       addResult.addResult('minigame2', result);
-      router.push({ pathname: '/games/EndGame', params: { gameName: 'minigame2' } });
+      setTimeout(() => {
+        router.push({ pathname: '/games/EndGame', params: { gameName: 'minigame2' } });
+      }, 500);
     }
   }, [gameOver]);
 
@@ -144,7 +157,7 @@ const checkBalance = (shouldVibrate = true): boolean => {
     const angularVelocity = Math.sqrt(x * x + y * y + z * z);
     const balanced = angularVelocity < 0.3; // soglia di equilibrio
 
-    if (!balanced && shouldVibrate) {
+    if (!balanced && shouldVibrate && gameStarted && !gameOver) {
       Vibration.vibrate(100);
     }
 
@@ -182,7 +195,7 @@ const checkBalance = (shouldVibrate = true): boolean => {
 
       {!showModal && (
         <>
-          <Text style={styles.text}>Timer: {timer}s</Text>
+          <Text style={styles.timer}>Timer: {timer}s</Text>
         </>
       )}
 
@@ -211,25 +224,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modal: {
-  position: 'absolute',
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  backgroundColor: 'rgba(0, 0, 0, 0.8)',
-  justifyContent: 'center',
-  alignItems: 'center',
-  zIndex: 10,
-},
-modalText: {
-  color: 'white',
-  fontSize: 24,
-  textAlign: 'center',
-  marginBottom: 20,
-},
-modalCountdown: {
-  color: 'white',
-  fontSize: 48,
-  fontWeight: 'bold',
-},
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  modalText: {
+    color: 'white',
+    fontSize: 24,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  modalCountdown: {
+    color: 'white',
+    fontSize: 48,
+    fontWeight: 'bold',
+  },
+  timer: {
+    fontSize: 24,
+    color: 'white',
+    margin: 4,
+    fontFamily: 'Courier New',
+    textAlign: 'center',
+    position: 'absolute',
+  }
 });

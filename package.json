@@ -47,7 +47,8 @@
     "react-native-toast-message": "^2.3.0",
     "react-native-web": "~0.20.0",
     "react-native-webview": "13.13.5",
-    "svg-path-properties": "^1.3.0"
+    "svg-path-properties": "^1.3.0",
+    "expo-audio": "~0.4.6"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
