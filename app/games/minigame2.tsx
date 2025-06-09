@@ -153,11 +153,13 @@ const checkBalance = (shouldVibrate = true): boolean => {
     <View style={[styles.container, isBalanced ? styles.green : styles.red]}>
 
       <Text style={styles.text}>Timer: {timer}s</Text>
-      <Text style={styles.text}>Equilibrio: {truncateTo3Decimals(balanceTime)}s</Text>
 
+      {/*
+      <Text style={styles.text}>Equilibrio: {truncateTo3Decimals(balanceTime)}s</Text>
       <Text style={styles.text}>x: {truncateTo3Decimals(x)}</Text>
       <Text style={styles.text}>y: {truncateTo3Decimals(y)}</Text>
       <Text style={styles.text}>z: {truncateTo3Decimals(z)}</Text>
+      */}
 
     </View>
   )
@@ -175,6 +177,8 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 18,
     margin: 4,
+    fontFamily: 'Courier New',
+    textAlign: 'center',
   },
   results: {
     marginTop: 20,
