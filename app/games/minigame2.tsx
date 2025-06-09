@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { Gyroscope, GyroscopeMeasurement } from 'expo-sensors';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, Vibration, View } from "react-native";
 
 import { useGameScore } from "./GameScoreContext";
@@ -16,6 +16,10 @@ export default function minigame2() {
 
   const router = useRouter();
   const addResult = useGameScore();
+  const isBalancedRef = useRef(false);
+
+  
+
 
   //sottoscrizione del listener al giroscopio
   const [subscription, setSubscription] = useState<ReturnType<typeof Gyroscope.addListener> | null>(null);
@@ -89,10 +93,12 @@ export default function minigame2() {
 
       // Controllo equilibrio ogni 200ms
       balanceInterval = setInterval(() => {
-        if (checkBalance(true)) {
+        if (isBalancedRef.current) {
           setBalanceTime(prev => prev + 0.2);
         }
       }, 200);
+
+
 
     }
 
@@ -105,13 +111,25 @@ export default function minigame2() {
 
   //controlla che il giroscopio sia pressocché fermo lungo i 3 assi
   //se rimane entro 0.1 0.1 0.1 é considerato fermo
+  /*
 const checkBalance = (shouldVibrate = true): boolean => {
   const balanced = Math.abs(x) < 0.1 && Math.abs(y) < 0.1 && Math.abs(z) < 0.1;
   if (!balanced && shouldVibrate) {
     Vibration.vibrate(200);
   }
   return balanced;
-};
+};*/
+  const checkBalance = (shouldVibrate = true): boolean => {
+    const angularVelocity = Math.sqrt(x * x + y * y + z * z);
+    const balanced = angularVelocity < 0.3; // soglia di equilibrio
+
+    if (!balanced && shouldVibrate) {
+      Vibration.vibrate(100);
+    }
+
+    return balanced;
+  };
+
 
 
   const truncateTo3Decimals = (value: number): number => {
@@ -119,6 +137,11 @@ const checkBalance = (shouldVibrate = true): boolean => {
   };
 
   const [isBalanced, setIsBalanced] = useState(false);
+
+  useEffect(() => {
+    isBalancedRef.current = isBalanced;
+  }, [isBalanced]);
+
 
   useEffect(() => {
     const balanced = checkBalance();

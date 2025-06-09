@@ -31,14 +31,14 @@ export default function GamesHome() {
         <Pressable style={styles.button}>
           <Text style={styles.buttonText}>Minigioco 1</Text>
         </Pressable>
-      </Link>
+      </Link>*/}
 
       <Link href="/games/minigame2" asChild>
         <Pressable style={styles.button}>
-          <Text style={styles.buttonText}>Minigioco 2</Text>
+          <Text style={styles.buttonText}>Minigioco Giroscopio</Text>
         </Pressable>
       </Link>
-
+        {/*
       <Link href="/games/minigamegolf" asChild>
         <Pressable style={styles.button}>
           <Text style={styles.buttonText}>Minigioco golf</Text>
