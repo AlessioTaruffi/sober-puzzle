@@ -18,6 +18,29 @@ export default function minigame2() {
   const addResult = useGameScore();
   const isBalancedRef = useRef(false);
 
+  //stati per gestire il modale pre-gioco
+  const [showModal, setShowModal] = useState(true);
+  const [modalCountdown, setModalCountdown] = useState(10);
+  const [gameStarted, setGameStarted] = useState(false); // controlla se il gioco è iniziato davvero
+
+  useEffect(() => {
+    if (showModal) {
+      const modalTimer = setInterval(() => {
+        setModalCountdown(prev => {
+          if (prev <= 1) {
+            clearInterval(modalTimer);
+            setShowModal(false);
+            setGameStarted(true); // inizia il gioco!
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(modalTimer);
+    }
+  }, [showModal]);
+
   
 
 
@@ -76,7 +99,7 @@ export default function minigame2() {
     let balanceInterval: number;
     let timerInterval: number;
 
-    if (!gameOver) {
+    if (gameStarted && !gameOver) { // <-- parte solo se il gioco è iniziato!
       // Timer ogni 1 secondo
       timerInterval = setInterval(() => {
         setTimer(prev => {
@@ -97,16 +120,14 @@ export default function minigame2() {
           setBalanceTime(prev => prev + 0.2);
         }
       }, 200);
-
-
-
     }
 
     return () => {
       clearInterval(timerInterval);
       clearInterval(balanceInterval);
     };
-  }, [gameOver]);
+  }, [gameStarted, gameOver]);
+
 
 
   //controlla che il giroscopio sia pressocché fermo lungo i 3 assi
@@ -152,17 +173,22 @@ const checkBalance = (shouldVibrate = true): boolean => {
   return(
     <View style={[styles.container, isBalanced ? styles.green : styles.red]}>
 
-      <Text style={styles.text}>Timer: {timer}s</Text>
+      {showModal && (
+        <View style={styles.modal}>
+          <Text style={styles.modalText}>Metti il telefono in testa{'\n'}Posizionati in un'area sicura</Text>
+          <Text style={styles.modalCountdown}>{modalCountdown}</Text>
+        </View>
+      )}
 
-      {/*
-      <Text style={styles.text}>Equilibrio: {truncateTo3Decimals(balanceTime)}s</Text>
-      <Text style={styles.text}>x: {truncateTo3Decimals(x)}</Text>
-      <Text style={styles.text}>y: {truncateTo3Decimals(y)}</Text>
-      <Text style={styles.text}>z: {truncateTo3Decimals(z)}</Text>
-      */}
+      {!showModal && (
+        <>
+          <Text style={styles.text}>Timer: {timer}s</Text>
+        </>
+      )}
 
     </View>
   )
+
 }
 
 const styles = StyleSheet.create({
@@ -183,5 +209,27 @@ const styles = StyleSheet.create({
   results: {
     marginTop: 20,
     alignItems: 'center',
-  }
+  },
+  modal: {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: 'rgba(0, 0, 0, 0.8)',
+  justifyContent: 'center',
+  alignItems: 'center',
+  zIndex: 10,
+},
+modalText: {
+  color: 'white',
+  fontSize: 24,
+  textAlign: 'center',
+  marginBottom: 20,
+},
+modalCountdown: {
+  color: 'white',
+  fontSize: 48,
+  fontWeight: 'bold',
+},
 });
