@@ -97,7 +97,7 @@ export default function App() {
 
   const handleEndTimer = () => {
     if (torchTimeout.current) {
-      clearTimeout(torchTimeout.current); // ✅ Cancella eventuale attivazione futura
+      clearTimeout(torchTimeout.current); 
       torchTimeout.current = null;
     }
 
@@ -105,23 +105,24 @@ export default function App() {
     torchEnabledRef.current = false;
 
     subscription?.remove();
+    setGameEnd(true);
+  };
 
-
-
-    const media = reactionTimes.current.length
+  useEffect(() => {
+    if(gameEnd){
+      const media = reactionTimes.current.length
 
       ? (reactionTimes.current.reduce((a, b) => a + b) / reactionTimes.current.length).toFixed(0)
       : 'N/A';
-
-    setGameEnd(true);
-
-    const result = {
-      name: 'Minigame Light',
-      reactionTime: media	
+      const result = {
+        name: 'Minigame Light',
+        reactionTime: media	
+      }
+      addResult.addResult('minigameLight', result);
+      router.push({ pathname: '/games/EndGame', params: { gameName: 'minigameLight' } });
     }
-    addResult.addResult('minigameLight', result);
-    router.push({ pathname: '/games/EndGame', params: { gameName: 'minigameLight' } });
-  };
+  }, [gameEnd]);
+
 
   useEffect(() => {
 

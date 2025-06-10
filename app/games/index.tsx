@@ -14,7 +14,7 @@ export default function GamesHome() {
       
 
       {/* TEST ENTRY POINT */}
-      <Link href="/games/minigameConta" asChild>
+      <Link href="/games/minigame1" asChild>
         <Pressable>
           <Text style={styles.takeTestText}>Take the test</Text>
         </Pressable>
@@ -31,14 +31,14 @@ export default function GamesHome() {
         <Pressable style={styles.button}>
           <Text style={styles.buttonText}>Minigioco 1</Text>
         </Pressable>
-      </Link>*/}
+      </Link>
 
       <Link href="/games/minigame2" asChild>
         <Pressable style={styles.button}>
           <Text style={styles.buttonText}>Minigioco Giroscopio</Text>
         </Pressable>
       </Link>
-        {/*
+        
       <Link href="/games/minigamegolf" asChild>
         <Pressable style={styles.button}>
           <Text style={styles.buttonText}>Minigioco golf</Text>
@@ -63,12 +63,13 @@ export default function GamesHome() {
         </Pressable>
       </Link>
 
+      
       <Link href="/games/minigameLigth" asChild>
         <Pressable style={styles.button}>
           <Text style={styles.buttonText}>Minigioco Light</Text>
         </Pressable>
       </Link>
-
+      
       <Link href="/games/minigameConta" asChild>
         <Pressable style={styles.button}>
           <Text style={styles.buttonText}>Minigioco ContaPassanti</Text>
