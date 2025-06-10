@@ -14,7 +14,7 @@ export default function GamesHome() {
       
 
       {/* TEST ENTRY POINT */}
-      <Link href="/games/minigamememo" asChild>
+      <Link href="/games/minigame1" asChild>
         <Pressable>
           <Text style={styles.takeTestText}>Take the test</Text>
         </Pressable>

@@ -78,14 +78,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#68f2c2',
-    padding: 24,
+    padding: 0,
   },
   headerText: {
     fontSize: 34,
     fontWeight: '400',
     color: '#1c1c1e',
     marginBottom: 30,
-    marginTop: 30,
+    marginTop: 60,
     textAlign: 'center',
   },
   contentBox: {
@@ -110,8 +110,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 12,
     elevation: 0,
-    borderColor: 'black',
-    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.2)',
+    borderWidth: 3,
     position: 'absolute',
     bottom: 20,
     left: 0,
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 0,
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0,
-    width: '115%',
+    width: '100%',
     height: 80,
     justifyContent: 'center',
     
