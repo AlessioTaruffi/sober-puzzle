@@ -1,7 +1,7 @@
+import { useAudioPlayer } from 'expo-audio';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-    Alert,
     Dimensions,
     StyleSheet,
     Text,
@@ -41,10 +41,13 @@ const GameScreen = () => {
     const [targetIndices, setTargetIndices] = useState<number[]>([]);
     const [isShowing, setIsShowing] = useState(true);
     const [forceReset, setForceReset] = useState(0);
+    const [isAudioPlaying, setIsAudioPlaying] = useState(false);
 
     const [timeLeft, setTimeLeft] = useState(20); //tempo limite in secondi
     const [maxRound, setMaxRound] = useState(1); //tracker del numero massimo di round raggiunto
 
+    const audioSource = require('../../assets/audio/tictaclungo.mp3');
+    const player = useAudioPlayer(audioSource);
 
     //effetto per il countdown globale
     //viene eseguito ogni secondo e decrementa il tempo rimasto
@@ -60,7 +63,11 @@ const GameScreen = () => {
 
     // 2) alert quando timeLeft arriva a zero
     useEffect(() => {
+
+
         if (timeLeft === 0) {
+            
+            player.pause();
             
             //salva il risultato del gioco
             const result = {
@@ -71,11 +78,17 @@ const GameScreen = () => {
             router.push({ pathname: '/games/EndGame', params: { gameName: 'minigamememo' } });
 
         }
+
     }, [timeLeft, maxRound]);
 
 
     //effetto che viene eseguito quando il componente viene montato o quando il round cambia
     useEffect(() => {
+        if(!isAudioPlaying) {
+            player.seekTo(0);
+            player.play();
+            setIsAudioPlaying(true);
+        }
         startNewRound();
     }, [round, forceReset]);
 
@@ -132,7 +145,12 @@ const GameScreen = () => {
 
         // 3. Verifica se ha selezionato una carta sbagliata
         if (!targetIndices.includes(index)) {
-            Vibration.vibrate(200);
+            Vibration.vibrate(300);
+            setTimeout(() => {
+                setRound(1);
+                setForceReset((prev) => prev + 1);
+            }, 200); //reset del round dopo un breve ritardo
+            /*
             setTimeout(() => { 
                 Alert.alert('Che sola', 'Hai toppato', [
                     { text: 'Riprova', onPress: () => {
@@ -142,7 +160,7 @@ const GameScreen = () => {
                         //in quanto altrimenti lo stato non si aggiornerebbe e non vi sarebbe un nuovo round
                     }
                 ]);
-            }, 200);
+            }, 200);*/
             return; //altrimenti fa il panico
         }
 
@@ -156,11 +174,16 @@ const GameScreen = () => {
 
         if (success) {
             setMaxRound((prev) => Math.max(prev, round)); //aggiorna il numero massimo di round se necessario
+            Vibration.vibrate(80); 
+            setTimeout(() => {
+                setRound((prev) => prev + 1); 
+            }, 200); //passa al round successivo dopo un breve ritardo
+            /*
             setTimeout(() => {
                 Alert.alert('Daje così', 'Tutte giuste', [
                     { text: 'Avanti', onPress: () => setRound((r) => r + 1) },
                 ]);
-            }, 200);
+            }, 200);*/
         }
     };
 
@@ -196,7 +219,7 @@ const generateRandomIndices = (total: number, count: number): number[] => {
 
 const styles = StyleSheet.create({
     timerText: {
-        fontSize: 18,
+        fontSize: 24,
         textAlign: 'center',
         marginBottom: 10,
         color: 'red',
@@ -207,9 +230,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     roundText: {
-        fontSize: 24,
+        fontSize: 28,
         textAlign: 'center',
-        marginBottom: 20,
+        marginBottom: 70,
     },
     grid: {
         flexDirection: 'row',
