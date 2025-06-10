@@ -89,6 +89,7 @@ export default function holdSteady() {
         }
     };
 
+    /*
     const handlePressOut = () => {
         if (
         (gamePhase === "holding" || gamePhase === "release") &&
@@ -164,18 +165,116 @@ export default function holdSteady() {
             startNewRound();
         }
         }
+    };*/
+    const handlePressOut = () => {
+        if (
+            (gamePhase === "holding" || gamePhase === "release") &&
+            holdStartTime.current !== null
+        ) {
+            const duration = Date.now() - holdStartTime.current;
+            setHoldDuration(duration);
+
+            let roundResult = "";
+            if (gamePhase === "release") {
+                if (
+                    duration >= targetHoldTime - tolerance &&
+                    duration <= targetHoldTime + tolerance
+                ) {
+                    roundResult = "✅";
+                } else if (duration < targetHoldTime - tolerance) {
+                    roundResult = "❌";
+                } else {
+                    roundResult = "❌";
+                }
+            } else {
+                roundResult = "❌";
+            }
+
+            // PREPARO il nuovo array completo con l'ultimo round incluso
+            const newResults = [
+                ...results,
+                {
+                    reactionTime: reactionTime || 0,
+                    holdDuration: duration,
+                    result: roundResult,
+                },
+            ];
+
+            setResults(newResults);
+
+            const nextRound = currentRound + 1;
+            setCurrentRound(nextRound);
+
+            if (nextRound >= targetRounds) {
+                setGamePhase("done");
+
+                const result = {
+                    name: "Hold Steady",
+                    rounds: targetRounds,
+                    results: newResults.map((res, index) => ({
+                        round: index + 1,
+                        reactionTime: res.reactionTime,
+                        holdDuration: res.holdDuration,
+                        result: res.result,
+                    })),
+                };
+
+                addResult.addResult("holdsteady", result);
+                router.push({ pathname: '/games/EndGame', params: { gameName: 'holdsteady' } });
+            } else {
+                startNewRound();
+            }
+        } else if (gamePhase === "ready") {
+            setReactionTime(0);
+            setHoldDuration(0);
+
+            const newResults = [
+                ...results,
+                {
+                    reactionTime: 0,
+                    holdDuration: 0,
+                    result: "Too quick ❌",
+                },
+            ];
+
+            setResults(newResults);
+
+            const nextRound = currentRound + 1;
+            setCurrentRound(nextRound);
+
+            if (nextRound >= targetRounds) {
+                setGamePhase("done");
+
+                const result = {
+                    name: "Hold Steady",
+                    rounds: targetRounds,
+                    results: newResults.map((res, index) => ({
+                        round: index + 1,
+                        reactionTime: res.reactionTime,
+                        holdDuration: res.holdDuration,
+                        result: res.result,
+                    })),
+                };
+
+                addResult.addResult("holdsteady", result);
+                router.push({ pathname: '/games/EndGame', params: { gameName: 'holdsteady' } });
+            } else {
+                startNewRound();
+            }
+        }
     };
+
 
     const getBackgroundColor = () => {
         switch (gamePhase) {
         case "waiting":
             return "#FFD700"; // giallo
         case "ready":
-            return "#00FF00"; // verde
+            return "#0fa632"; // verde
         case "holding":
             return "#FFD700"; // giallo
         case "release":
-            return "#00FF00"; // verde
+            return "#0fa632"; // verde
         case "done":
             return "#111"; // neutro finale
         default:
@@ -185,22 +284,18 @@ export default function holdSteady() {
 
     return (
         <View style={[styles.container, { backgroundColor: getBackgroundColor() }]}>
-        <Text style={styles.title}>SoberPuzzle - Hold Steady</Text>
-        <Text style={styles.subtitle}>
-            Round {Math.min(currentRound + 1, targetRounds)} / {targetRounds}
-        </Text>
 
         {gamePhase === "waiting" && (
-            <Text style={styles.instructions}>Preparati...</Text>
+            <Text style={styles.instructions}>Preparati</Text>
         )}
         {gamePhase === "ready" && (
-            <Text style={styles.instructions}>PREMI ORA!</Text>
+            <Text style={styles.instructions}>PREMI!</Text>
         )}
         {gamePhase === "holding" && (
-            <Text style={styles.instructions}>Tienilo premuto...</Text>
+            <Text style={styles.instructions}>Mantieni</Text>
         )}
         {gamePhase === "release" && (
-            <Text style={styles.instructions}>Rilascia ORA!</Text>
+            <Text style={styles.instructions}>RILASCIA!</Text>
         )}
         {/*gamePhase === "done" && (
             <>
@@ -216,6 +311,9 @@ export default function holdSteady() {
             </Pressable>
             </>
         )*/}
+        <Text style={styles.subtitle}>
+            Round {Math.min(currentRound + 1, targetRounds)} / {targetRounds}
+        </Text>
 
         
         {gamePhase !== "done" && (
@@ -228,7 +326,7 @@ export default function holdSteady() {
             ]}
             disabled={!promptShown}
             >
-            <Text style={styles.buttonText}>Premi qui</Text>
+            
             </Pressable>
         )}
         </View>
@@ -253,10 +351,11 @@ subtitle: {
     fontSize: 18,
     color: "#111",
     marginBottom: 20,
+    marginTop: 10,	
 },
 instructions: {
-    fontSize: 20,
-    color: "#111",
+    fontSize: 40,
+    color: "#black",
     marginBottom: 20,
     fontWeight: "bold",
 },
@@ -264,18 +363,24 @@ button: {
     width: BUTTON_SIZE,
     height: BUTTON_SIZE,
     borderRadius: BUTTON_SIZE / 2,
-    borderWidth: 4,
-    borderColor: "#00FFFF",
+    borderWidth: 0,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "transparent",
+    backgroundColor: "#D32F2F", // rosso intenso
     marginTop: 20,
+
+    // Simulazione reflection con shadow
+    shadowColor: "#000",
+    shadowOffset: { width: 4, height: 4 },
+    shadowOpacity: 0.6,
+    shadowRadius: 10,
+    elevation: 8, // per Android (simula un effetto riflesso con ombra)
 },
 buttonPressed: {
-    backgroundColor: "rgba(0, 255, 255, 0.2)",
+    backgroundColor: "#B71C1C", // rosso ancora più scuro quando premuto
 },
 buttonText: {
-    color: "#00FFFF",
+    color: "#FFFFFF", // testo bianco invariato
     fontWeight: "bold",
     fontSize: 18,
 },

@@ -14,7 +14,7 @@ const badgeImages = {
 export const renderers: Record<string, Renderer> = {
   "minigameConta": (data) => (
   <View style={styles.container}>
-    <Text style={styles.title}>🍽️ Conta Oggetti</Text>
+    <Text style={styles.title}>🍽️ Memoria Visiva</Text>
     <View style={styles.metricRow}>
       <Text style={styles.label}>Birre viste:</Text>
       <Text style={styles.value}>{data.beers.user} / {data.beers.correct}</Text>
@@ -43,7 +43,7 @@ export const renderers: Record<string, Renderer> = {
 
 "minigame1": (data) => (
   <View style={styles.container}>
-    <Text style={styles.title}>⚡ Reazione</Text>
+    <Text style={styles.title}>⚡ Tempi di Reazione</Text>
     <View style={styles.metricRow}><Text style={styles.label}>Tentativi:</Text><Text style={styles.value}>{data.attempts}</Text></View>
     <View style={styles.metricRow}><Text style={styles.label}>Corrette:</Text><Text style={styles.value}>{data.correct}</Text></View>
     <View style={styles.metricRow}><Text style={styles.label}>Errate:</Text><Text style={styles.value}>{data.wrong}</Text></View>
@@ -60,7 +60,7 @@ export const renderers: Record<string, Renderer> = {
 
 "minigamegolf": (data) => (
   <View style={styles.container}>
-    <Text style={styles.title}>🏌️ Mini Golf</Text>
+    <Text style={styles.title}>🏌️ Concentrazione</Text>
     <View style={styles.metricRow}><Text style={styles.label}>Tentativi:</Text><Text style={styles.value}>{data.tries}</Text></View>
     <View style={styles.metricRow}><Text style={styles.label}>Esito:</Text><Text style={styles.value}>{data.outcome}</Text></View>
   </View>
@@ -89,12 +89,11 @@ export const renderers: Record<string, Renderer> = {
 
 "holdsteady": (data) => (
   <View style={styles.container}>
-    <Text style={styles.title}>🎯 Hold Steady</Text>
-    <View style={styles.metricRow}><Text style={styles.label}>Round previsti:</Text><Text style={styles.value}>{data.targetRounds}</Text></View>
+    <Text style={styles.title}>🎯 Riflessi</Text>
     {data.results.map((res: any) => (
       <View key={res.round} style={styles.metricRow}>
         <Text style={styles.label}>Round {res.round}:</Text>
-        <Text style={styles.value}>RT {res.reactionTime} ms | Hold {res.holdDuration} ms | {res.result}</Text>
+        <Text style={styles.value}>RT {res.reactionTime} ms | {res.result}</Text>
       </View>
     ))}
   </View>
@@ -213,13 +212,17 @@ export const styles = StyleSheet.create({
     borderTopRightRadius: 0,
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0,
-    width: '115%',
-    justifyContent: 'center',
+    width: '100%',
     borderWidth: 1,
     borderColor: 'black',
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderEndColor: 'transparent',
+    borderStartColor: 'transparent',
+
   },
   title: {
-    fontSize: 22,
+    fontSize: 28,
     fontWeight: '700',
     color: '#2c2c2e',
     marginBottom: 16,
@@ -232,12 +235,12 @@ export const styles = StyleSheet.create({
     borderBottomColor: '#e6e6e6',
   },
   label: {
-    fontSize: 16,
+    fontSize: 22,
     color: '#6b6b6b',
     fontWeight: '500',
   },
   value: {
-    fontSize: 16,
+    fontSize: 22,
     color: '#1c1c1e',
     fontWeight: '600',
   },

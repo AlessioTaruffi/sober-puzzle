@@ -19,6 +19,31 @@ const defaultRenderer = (data: any) => (
   </View>
 );  
 
+const gameNameToTitle = (gameName: string) => {
+  switch (gameName) {
+    case 'minigame1':
+      return 'Simon Says';
+    case 'minigame2':
+      return 'Keep it Steady';
+    case 'minigamegolf':
+      return 'Golf it';
+    case 'minigamememo':
+      return 'Memento Imago';
+    case 'minigameTorre':
+      return 'Torre di Hanoi';
+    case 'minigameShot':
+      return 'Shot';
+    case 'minigameConta':
+      return 'Count it Up';
+    case 'minigameLigth':
+      return 'Light it Up';
+    case 'holdsteady':
+      return 'Hold Steady';
+    default:
+      return gameName.charAt(0).toUpperCase() + gameName.slice(1);
+  }
+}
+
 export default function EndScreen(){
   const params = useLocalSearchParams();
   const gameName = typeof params.gameName === 'string' ? params.gameName : '';
@@ -38,7 +63,7 @@ export default function EndScreen(){
   <GameScoreProvider>
     <View style={styles.container}>
       <Text style={styles.headerText}>
-        {gameName}
+        {gameNameToTitle(gameName)}
       </Text>
 
       <View>
@@ -123,6 +148,10 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 80,
     justifyContent: 'center',
+    borderEndColor: 'transparent',
+    borderStartColor: 'transparent',
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
     
     
   },
