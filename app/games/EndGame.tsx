@@ -57,7 +57,13 @@ export default function EndScreen(){
           } else if (gameName === "final") {
             router.push('/');
           } else {
-            router.push(nextGameRoute as any);
+            console.log('Navigating to next game:', nextGameRoute);
+            try {
+              router.push(nextGameRoute as any);
+            } catch (error) {
+              console.error('Error navigating to next game:', error);
+            }
+            
           }
         }}
       >

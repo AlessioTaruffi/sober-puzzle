@@ -111,15 +111,17 @@ export default function App() {
   useEffect(() => {
     if(gameEnd){
       const media = reactionTimes.current.length
-
       ? (reactionTimes.current.reduce((a, b) => a + b) / reactionTimes.current.length).toFixed(0)
       : 'N/A';
+      console.log("media calcolata");
       const result = {
-        name: 'Minigame Light',
+        name: 'Minigame Ligth',
         reactionTime: media	
       }
-      addResult.addResult('minigameLight', result);
-      router.push({ pathname: '/games/EndGame', params: { gameName: 'minigameLight' } });
+      console.log("risultati calcolati");
+      addResult.addResult('minigameLigth', result);
+      console.log("risultati aggiunti");
+      router.push({ pathname: '/games/EndGame', params: { gameName: 'minigameLigth' } });
     }
   }, [gameEnd]);
 
