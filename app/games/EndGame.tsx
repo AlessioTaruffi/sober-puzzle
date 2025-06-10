@@ -38,10 +38,10 @@ export default function EndScreen(){
   <GameScoreProvider>
     <View style={styles.container}>
       <Text style={styles.headerText}>
-        Gioco completato: {gameName}
+        {gameName}
       </Text>
 
-      <View style={styles.contentBox}>
+      <View>
         {data
           ? Renderer
             ? Renderer(data)
@@ -77,14 +77,16 @@ export default function EndScreen(){
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f7f7f7',
+    backgroundColor: '#68f2c2',
     padding: 24,
   },
   headerText: {
-    fontSize: 26,
-    fontWeight: '700',
+    fontSize: 34,
+    fontWeight: '400',
     color: '#1c1c1e',
-    marginBottom: 20,
+    marginBottom: 30,
+    marginTop: 30,
+    textAlign: 'center',
   },
   contentBox: {
     backgroundColor: '#ffffff',
@@ -103,16 +105,31 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   button: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#68f2c2',
     paddingVertical: 14,
     paddingHorizontal: 20,
     borderRadius: 12,
-    elevation: 2,
+    elevation: 0,
+    borderColor: 'black',
+    borderWidth: 1,
+    position: 'absolute',
+    bottom: 20,
+    left: 0,
+    marginBottom: 20,
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+    width: '115%',
+    height: 80,
+    justifyContent: 'center',
+    
+    
   },
   buttonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '600',
+    color: 'black',
+    fontSize: 20,
+    fontWeight: '700',
     textAlign: 'center',
   },
 });
