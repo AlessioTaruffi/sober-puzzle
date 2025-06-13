@@ -1,24 +1,31 @@
 import { Animated, Easing, StyleSheet, Text, View } from "react-native";
 import { gamesList } from "./gamesList";
 
-import { useGameScore } from "./GameScoreContext";
-
+import { useAudioPlayer } from 'expo-audio';
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from 'react';
 import {
   TouchableOpacity,
   Vibration
 } from 'react-native';
+import { useGameScore } from "./GameScoreContext";
+import CountdownModal from "./countdownmodal";
 
 const COLORS = ['red', 'blue', 'green', 'yellow', 'purple', 'orange'];
-
 
 export default function minigame1() {
 
   const addResult = useGameScore();
-  const shakeAnim = useRef(new Animated.Value(0)).current; //animazione per shake
+  const router = useRouter();
+  const shakeAnim = useRef(new Animated.Value(0)).current;
 
-  //funzione che gestisce l'animazione di shake
+  const audioSource = require('../../assets/audio/count.mp3');
+  const player = useAudioPlayer(audioSource);
+
+  // schermata modale
+  const [showModal, setShowModal] = useState(true);
+  const [gameStarted, setGameStarted] = useState(false);
+
   const triggerShake = () => {
     shakeAnim.setValue(0);
     Animated.sequence([
@@ -49,8 +56,6 @@ export default function minigame1() {
     ]).start();
   };
 
-
-  
   const [timer, setTimer] = useState(20);
   const [activeColor, setActiveColor] = useState<string | null>(null);
   const [reactionStart, setReactionStart] = useState<number | null>(null);
@@ -59,20 +64,20 @@ export default function minigame1() {
   const [showEndScreen, setShowEndScreen] = useState(false);
   const [gameEnded, setGameEnded] = useState(false);
 
-
-
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const colorTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    startTimer();
-    scheduleNextColor();
+    if (gameStarted) {
+      startTimer();
+      scheduleNextColor();
+    }
 
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
       if (colorTimeoutRef.current) clearTimeout(colorTimeoutRef.current);
     };
-  }, []);
+  }, [gameStarted]);
 
   const startTimer = () => {
     intervalRef.current = setInterval(() => {
@@ -89,7 +94,7 @@ export default function minigame1() {
   };
 
   const scheduleNextColor = () => {
-    const delay = Math.floor(Math.random() * 1000) + 500; // Ritardo tra 1 e 1.5 secondi tra i colori. A STECCA SEEE
+    const delay = Math.floor(Math.random() * 1000) + 500;
     colorTimeoutRef.current = setTimeout(() => {
       const newColor = COLORS[Math.floor(Math.random() * COLORS.length)];
       setActiveColor(newColor);
@@ -98,32 +103,26 @@ export default function minigame1() {
   };
 
   const handlePress = (color: string) => {
-  
     if (!activeColor || !reactionStart) return;
-  
+
     const time = Date.now() - reactionStart;
     const correct = color === activeColor;
 
-
     if (!correct){
-      triggerShake(); //attiva animazione di shake se la risposta è sbagliata
+      triggerShake();
       Vibration.vibrate(500); 
     } else {
       Vibration.vibrate(50);
     }
-  
+
     resultsRef.current.push({ time, correct });
     setActiveColor(null);
     setReactionStart(null);
-  
+
     if (colorTimeoutRef.current) clearTimeout(colorTimeoutRef.current);
     colorTimeoutRef.current = setTimeout(scheduleNextColor, 500);
   };
-    
-    
-    
-    
-  
+
   const handleEndGame = () => {
     if (activeColor && reactionStart) {
       resultsRef.current.push({
@@ -134,7 +133,6 @@ export default function minigame1() {
     setGameEnded(true);
   };
 
-  //diviso per evitare l'update di gameEnded durante il render (react si incazza)
   useEffect(() => {
     if (gameEnded) {
       const allResults = resultsRef.current;
@@ -154,113 +152,115 @@ export default function minigame1() {
 
       addResult.addResult('minigame1', result);
 
-      //Alert.alert(
-       // 'Gioco terminato!',
-       // `🎯 Tentativi: ${allResults.length}\n✅ Corrette: ${correct}\n❌ Sbagliate: ${wrong}\n⏱ Tempo medio: ${avgTime} ms`
-      //);
       router.push({ pathname: '/games/EndGame', params: { gameName: 'minigame1' } });
 
-      //setShowEndScreen(true);
-      setGameEnded(false); // Resetto lo stato
+      setGameEnded(false);
     }
   }, [gameEnded]);
 
+  const restartGame = () => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    if (colorTimeoutRef.current) clearTimeout(colorTimeoutRef.current);
 
-  
-    const restartGame = () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      if (colorTimeoutRef.current) clearTimeout(colorTimeoutRef.current);
-  
-      resultsRef.current = [];
-      setTimer(20);
-      setActiveColor(null);
-      setReactionStart(null);
-      setForceUpdate((n) => n + 1);
-      setShowEndScreen(false);
-      startTimer();
-      scheduleNextColor();
-    };
+    resultsRef.current = [];
+    setTimer(20);
+    setActiveColor(null);
+    setReactionStart(null);
+    setForceUpdate((n) => n + 1);
+    setShowEndScreen(false);
 
-    const router = useRouter();
-    const currentGame = "/games/minigame1";
-    const currentIndex = gamesList.indexOf(currentGame);
-    const nextGame = gamesList[currentIndex + 1] 
+    setShowModal(true);
+    setGameStarted(false);
+  };
 
-    if (showEndScreen) {
-      return (
-        <View style={styles.container}>
-          <Text style={styles.title}>🎮 Gioco Terminato!</Text>
+  const currentGame = "/games/minigame1";
+  const currentIndex = gamesList.indexOf(currentGame);
+  const nextGame = gamesList[currentIndex + 1];
 
-          <TouchableOpacity style={styles.button} onPress={restartGame}>
-            <Text style={styles.restartText}>🔁 Rigioca</Text>
-          </TouchableOpacity>
-
-          {nextGame ? (
-            <TouchableOpacity
-              style={[styles.button, { marginTop: 20 }]}
-              onPress={() => {
-                setShowEndScreen(false);
-                router.push(nextGame as any);
-              }}
-            >
-              <Text style={styles.restartText}>➡️ Prossimo Gioco</Text>
-            </TouchableOpacity>
-          ) : (
-            <Text style={{ color: "white", marginTop: 20 }}>
-              Hai completato tutti i giochi!
-            </Text>
-          )}
-        </View>
-      );
-  }
-
-  
+  if (showEndScreen) {
     return (
       <View style={styles.container}>
-        <TouchableOpacity style={styles.restartButton} onPress={restartGame}>
-          <Text style={styles.restartText}>🔄</Text>
-        </TouchableOpacity>
-  
-        <Text style={styles.timer}>{timer}s</Text>
-  
-        <Animated.View
-          style={[
-            styles.colorBox,
-            {
-              backgroundColor: activeColor || '#999',
-              borderWidth: activeColor ? 4 : 0,
-              borderColor: 'white',
-              transform: [
-                {
-                  translateX: shakeAnim.interpolate({
-                    inputRange: [-1, 1],
-                    outputRange: [-10, 10], // quanto "oscilla"
-                  }),
-                },
-              ],
-            },
-          ]}
-        />
+        <Text style={styles.title}>🎮 Gioco Terminato!</Text>
 
-  
-        <View style={styles.buttonContainer}>
-          {COLORS.map((color) => (
-            <TouchableOpacity
-              key={color}
-              style={[
-                styles.button,
-                { backgroundColor: color },
-              ]}
-              onPress={() => handlePress(color)}
-            />
-          ))}
-        </View>
+        <TouchableOpacity style={styles.button} onPress={restartGame}>
+          <Text style={styles.restartText}>🔁 Rigioca</Text>
+        </TouchableOpacity>
+
+        {nextGame ? (
+          <TouchableOpacity
+            style={[styles.button, { marginTop: 20 }]}
+            onPress={() => {
+              setShowEndScreen(false);
+              router.push(nextGame as any);
+            }}
+          >
+            <Text style={styles.restartText}>➡️ Prossimo Gioco</Text>
+          </TouchableOpacity>
+        ) : (
+          <Text style={{ color: "white", marginTop: 20 }}>
+            Hai completato tutti i giochi!
+          </Text>
+        )}
       </View>
     );
+  }
+
+  return (
+    <View style={styles.container}>
+      {showModal && (
+        <CountdownModal
+          text="Premi il colore mostrato il più velocemente possibile"
+          onFinish={() => {
+            setShowModal(false);
+            setGameStarted(true);
+          }}
+        />
+      )}
+
+
+      {!showModal && (
+        <>
+
+          <Text style={styles.timer}>{timer}s</Text>
+
+          <Animated.View
+            style={[
+              styles.colorBox,
+              {
+                backgroundColor: activeColor || '#999',
+                borderWidth: activeColor ? 4 : 0,
+                borderColor: 'white',
+                transform: [
+                  {
+                    translateX: shakeAnim.interpolate({
+                      inputRange: [-1, 1],
+                      outputRange: [-10, 10],
+                    }),
+                  },
+                ],
+              },
+            ]}
+          />
+
+          <View style={styles.buttonContainer}>
+            {COLORS.map((color) => (
+              <TouchableOpacity
+                key={color}
+                style={[
+                  styles.button,
+                  { backgroundColor: color },
+                ]}
+                onPress={() => handlePress(color)}
+              />
+            ))}
+          </View>
+        </>
+      )}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-
   title: { fontSize: 22, marginBottom: 10 },
   container: {
     flex: 1,
@@ -306,5 +306,28 @@ const styles = StyleSheet.create({
   restartText: {
     fontSize: 24,
     color: 'white',
+  },
+  // modale come in minigame2 (standard per tutti)
+  modal: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  modalText: {
+    color: 'white',
+    fontSize: 24,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  modalCountdown: {
+    color: 'white',
+    fontSize: 48,
+    fontWeight: 'bold',
   },
 });

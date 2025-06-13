@@ -10,6 +10,7 @@ import {
   View
 } from 'react-native';
 import { useGameScore } from "./GameScoreContext";
+import CountdownModal from './countdownmodal';
 
 export default function App() {
 
@@ -26,6 +27,10 @@ export default function App() {
   const [subscription, setSubscription] = useState<any>(null);
   const [gameEnd, setGameEnd] = useState(false);
   const torchEnabledRef = useRef(false); // NEW
+  const [showModal, setShowModal] = useState(true);
+  const [gameStarted, setGameStarted] = useState(false);
+
+  
 
   useEffect(() => {
     torchEnabledRef.current = torchEnabled;
@@ -34,6 +39,8 @@ export default function App() {
   // Timer principale
   useEffect(() => {
     if (!permission?.granted) return;
+    if (!gameStarted) return; // AGGIUNTO
+
     startTimer();
     setupShakeDetection();
 
@@ -42,7 +49,8 @@ export default function App() {
       if (torchTimeout.current) clearTimeout(torchTimeout.current);
       subscription?.remove();
     };
-  }, [permission]);
+  }, [permission, gameStarted]); // AGGIUNTA gameStarted
+
 
   const startTimer = () => {
     setTimer(20);
@@ -147,15 +155,33 @@ export default function App() {
   }
 
   return (
+
+
+    
     <View style={styles.container}>
-      <CameraView
-        style={{ width: 0, height: 0, opacity: 0 }}
-        facing={facing}
-        enableTorch={torchEnabled}
-      />
-      <View style={styles.timerContainer}>
-        <Text style={styles.timer}>{timer}s</Text>
-      </View>
+
+      {showModal && (
+        <CountdownModal
+          text="Scuoti il telefono quando la luce si accende"
+          onFinish={() => {
+            setShowModal(false);
+            setGameStarted(true);
+          }}
+        />
+      )}
+
+      {!showModal && (
+        <>
+        <CameraView
+          style={{ width: 0, height: 0, opacity: 0 }}
+          facing={facing}
+          enableTorch={torchEnabled}
+        />
+        <View style={styles.timerContainer}>
+          <Text style={styles.timer}>{timer}s</Text>
+        </View>
+        </>
+      )}
 
     </View>
   );

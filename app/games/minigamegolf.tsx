@@ -5,10 +5,14 @@ import { useEffect, useRef, useState } from 'react';
 import { Dimensions, StyleSheet, Vibration, View } from "react-native";
 import Svg, { Path } from 'react-native-svg';
 import { useGameScore } from "./GameScoreContext";
+import CountdownModal from "./countdownmodal";
 
 export default function MinigameGolf() {
 
     const addResult = useGameScore();
+    const [showModal, setShowModal] = useState(true);
+    const [gameStarted, setGameStarted] = useState(false);
+
 
     //Dimensioni dello schermo 
     const SCREEN_WIDTH = Dimensions.get("window").width;
@@ -174,11 +178,12 @@ export default function MinigameGolf() {
 
     //Sottoscrizione e rimozione del listener al giroscopio
     useEffect(() => {
+        if (!gameStarted) return; // ← aggiunto
+
         const init = async () => {
             await calibrateGyroscope();
             setSubscription(
                 Gyroscope.addListener(data => {
-                    // Rimuove il bias dalla lettura
                     setGyroData({
                         x: data.x - gyroBias.x,
                         y: data.y - gyroBias.y,
@@ -188,12 +193,12 @@ export default function MinigameGolf() {
             );
         };
         init();
-    
+
         return () => {
             subscription?.remove();
             setSubscription(null);
         };
-    }, []);
+    }, [gameStarted]); //dipendenza da gameStarted
 
     // Verifica se la pallina è vicina a uno dei punti che simulano la curva
     function isBallNearPath(ballX: number, ballY: number, tolerance = 20) {
@@ -326,8 +331,24 @@ export default function MinigameGolf() {
             />
             ))} /*}
 
+            
+            
+
 
             {/* Percorso SVG */}
+
+
+        {showModal && (
+            <CountdownModal
+                text="Guida la pallina nella buca senza uscire dal percorso"
+                onFinish={() => {
+                    setShowModal(false);
+                    setGameStarted(true);
+                }}
+            />
+        )}
+        {!showModal && (
+            <>
             <Svg height={SCREEN_HEIGHT} width={SCREEN_WIDTH} style={StyleSheet.absoluteFill}>
                 <Path
                     d={pathData}
@@ -339,10 +360,8 @@ export default function MinigameGolf() {
                 />
             </Svg>
 
-            {/* Buca */}
             <View style={[styles.hole, { top: holePosition.top - 25, left: holePosition.left - 25 }]} />
 
-            {/* Pallina */}
             <View style={[styles.ball, { top: ballPosition.top, left: ballPosition.left }]} />
 
             {(isCalibrating) && (
@@ -350,6 +369,9 @@ export default function MinigameGolf() {
                     <Text style={styles.winText}>Calibrazione...</Text>
                 </View>
             )}
+            </>
+        )}
+            
         </View>
     );
 }

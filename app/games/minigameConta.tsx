@@ -10,7 +10,9 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { useGameScore } from './GameScoreContext'; // Assicurati che il percorso sia corretto
+import { useGameScore } from './GameScoreContext';
+import CountdownModal from './countdownmodal';
+
 const { width, height } = Dimensions.get('window');
 const GAME_AREA_WIDTH = width * 0.9;
 const GAME_AREA_HEIGHT = height * 0.8;
@@ -39,6 +41,9 @@ export default function MinigameConta({
   numPassers = 10,
 }: MinigameContaProps) {
 
+  const [showModal, setShowModal] = useState(true); // aggiunto
+  const [gameStarted, setGameStarted] = useState(false); // aggiunto
+
   const [passers, setPassers] = useState<Passer[]>([]);
   const [gameOver, setGameOver] = useState(false);
   const [correctBeerCount, setCorrectBeerCount] = useState(0);
@@ -62,7 +67,7 @@ export default function MinigameConta({
   };
 
   useEffect(() => {
-    if (gameOver) return;
+    if (!gameStarted || gameOver) return; // modificato
 
     const newPassers: Passer[] = Array.from({ length: numPassers }, (_, i) => {
       const prob = Math.random();
@@ -85,7 +90,7 @@ export default function MinigameConta({
     },  duration);
 
     return () => clearTimeout(timer);
-  }, [gameOver]);
+  }, [gameStarted, gameOver]); // modificato
 
   const animateMovement = (x: Animated.Value, y: Animated.Value) => {
     const move = () => {
@@ -104,112 +109,120 @@ export default function MinigameConta({
     };
     move();
   };
-const {addResult} = useGameScore();
-const handleSubmit = () => {
-  addResult('minigameConta', {
-    beers: {
-      user: userBeerInput,
-      correct: correctBeerCount,
-    },
-    water: {
-      user: userWaterInput,
-      correct: correctWaterCount,
-    },
-    food: {
-      user: userFoodInput,
-      correct: correctFoodCount,
-    },
-  });
-  router.push({pathname: './EndGame', params: { gameName: 'minigameConta', }});
-  
-};
 
-  if (!isReady || navigating) {
-  return <Text>Loading...</Text>;
-}
+  const {addResult} = useGameScore();
 
-if (gameOver) {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Quanta roba hai visto?</Text>
-
-      <Text style={{ fontSize: 18, marginTop: 20 }}>Birre: {userBeerInput}</Text>
-      <View style={styles.sliderRow}>
-        <Text>0</Text>
-        <Slider
-          style={styles.slider}
-          minimumValue={0}
-          maximumValue={numPassers}
-          step={1}
-          value={userBeerInput}
-          onValueChange={setUserBeerInput}
-        />
-        <Text>{numPassers}</Text>
-      </View>
-
-      <Text style={{ fontSize: 18, marginTop: 20 }}>Acqua: {userWaterInput}</Text>
-      <View style={styles.sliderRow}>
-        <Text>0</Text>
-        <Slider
-          style={styles.slider}
-          minimumValue={0}
-          maximumValue={numPassers}
-          step={1}
-          value={userWaterInput}
-          onValueChange={setUserWaterInput}
-        />
-        <Text>{numPassers}</Text>
-      </View>
-
-      <Text style={{ fontSize: 18, marginTop: 20 }}>Cibo: {userFoodInput}</Text>
-      <View style={styles.sliderRow}>
-        <Text>0</Text>
-        <Slider
-          style={styles.slider}
-          minimumValue={0}
-          maximumValue={numPassers}
-          step={1}
-          value={userFoodInput}
-          onValueChange={setUserFoodInput}
-        />
-        <Text>{numPassers}</Text>
-        
-      </View>
-
-      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Verifica</Text>
-      </TouchableOpacity>
-    </View>
-  );
-}
-
-  
+  const handleSubmit = () => {
+    addResult('minigameConta', {
+      beers: {
+        user: userBeerInput,
+        correct: correctBeerCount,
+      },
+      water: {
+        user: userWaterInput,
+        correct: correctWaterCount,
+      },
+      food: {
+        user: userFoodInput,
+        correct: correctFoodCount,
+      },
+    });
+    router.push({pathname: './EndGame', params: { gameName: 'minigameConta', }});
+  };
 
   return (
     <View style={styles.container}>
-      <ImageBackground
-        source={require('../../assets/images/bar.jpg')}
-        style={styles.gameArea}
-        imageStyle={{ borderRadius: 12 }}
-        onLayout={(event) => {
-          const { x, y } = event.nativeEvent.layout;
-          setGameAreaLayout({ x, y });
-        }}
-      >
-        {passers.map(passer => (
-          <Animated.Image
-            key={passer.id}
-            source={images[passer.type]}
-            style={[
-              styles.passer,
-              {
-                left: passer.x,
-                top: passer.y,
-              },
-            ]}
-          />
-        ))}
-      </ImageBackground>
+      {showModal && (
+        <CountdownModal
+          text="Conta quanti oggetti passano nel bar"
+          onFinish={() => {
+            setShowModal(false);
+            setGameStarted(true);
+          }}
+        />
+      )}
+
+      {!showModal && (
+        <>
+          {(!isReady || navigating) && <Text>Loading...</Text>}
+
+          {gameOver ? (
+            <View style={styles.container}>
+              <Text style={styles.title}>Quanta roba hai visto?</Text>
+
+              <Text style={{ fontSize: 18, marginTop: 20 }}>Birre: {userBeerInput}</Text>
+              <View style={styles.sliderRow}>
+                <Text>0</Text>
+                <Slider
+                  style={styles.slider}
+                  minimumValue={0}
+                  maximumValue={numPassers}
+                  step={1}
+                  value={userBeerInput}
+                  onValueChange={setUserBeerInput}
+                />
+                <Text>{numPassers}</Text>
+              </View>
+
+              <Text style={{ fontSize: 18, marginTop: 20 }}>Acqua: {userWaterInput}</Text>
+              <View style={styles.sliderRow}>
+                <Text>0</Text>
+                <Slider
+                  style={styles.slider}
+                  minimumValue={0}
+                  maximumValue={numPassers}
+                  step={1}
+                  value={userWaterInput}
+                  onValueChange={setUserWaterInput}
+                />
+                <Text>{numPassers}</Text>
+              </View>
+
+              <Text style={{ fontSize: 18, marginTop: 20 }}>Cibo: {userFoodInput}</Text>
+              <View style={styles.sliderRow}>
+                <Text>0</Text>
+                <Slider
+                  style={styles.slider}
+                  minimumValue={0}
+                  maximumValue={numPassers}
+                  step={1}
+                  value={userFoodInput}
+                  onValueChange={setUserFoodInput}
+                />
+                <Text>{numPassers}</Text>
+              </View>
+
+              <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+                <Text style={styles.buttonText}>Verifica</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <ImageBackground
+              source={require('../../assets/images/bar.jpg')}
+              style={styles.gameArea}
+              imageStyle={{ borderRadius: 12 }}
+              onLayout={(event) => {
+                const { x, y } = event.nativeEvent.layout;
+                setGameAreaLayout({ x, y });
+              }}
+            >
+              {passers.map(passer => (
+                <Animated.Image
+                  key={passer.id}
+                  source={images[passer.type]}
+                  style={[
+                    styles.passer,
+                    {
+                      left: passer.x,
+                      top: passer.y,
+                    },
+                  ]}
+                />
+              ))}
+            </ImageBackground>
+          )}
+        </>
+      )}
     </View>
   );
 }
@@ -267,32 +280,30 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   tapArea: {
-  width: '100%',
-  height: 200,
-  backgroundColor: '#eef',
-  borderRadius: 12,
-  justifyContent: 'center',
-  alignItems: 'center',
-  marginBottom: 20,
-  borderWidth: 1,
-  borderColor: '#888',
-},
-tapText: {
-  fontSize: 28,
-  fontWeight: 'bold',
-},
-sliderRow: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  width: '100%',
-  paddingHorizontal: 10,
-  marginVertical: 10,
-},
-slider: {
-  flex: 1,
-  marginHorizontal: 10,
-},
-
-
+    width: '100%',
+    height: 200,
+    backgroundColor: '#eef',
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#888',
+  },
+  tapText: {
+    fontSize: 28,
+    fontWeight: 'bold',
+  },
+  sliderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingHorizontal: 10,
+    marginVertical: 10,
+  },
+  slider: {
+    flex: 1,
+    marginHorizontal: 10,
+  },
 });

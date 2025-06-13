@@ -8,6 +8,7 @@ import {
     Vibration,
     View
 } from 'react-native';
+import CountdownModal from './countdownmodal';
 import FlipCard from './flipcard';
 import { useGameScore } from "./GameScoreContext";
 
@@ -43,6 +44,10 @@ const GameScreen = () => {
     const [forceReset, setForceReset] = useState(0);
     const [isAudioPlaying, setIsAudioPlaying] = useState(false);
 
+    const [showModal, setShowModal] = useState(true);
+    const [gameStarted, setGameStarted] = useState(false);
+
+
     const [timeLeft, setTimeLeft] = useState(20); //tempo limite in secondi
     const [maxRound, setMaxRound] = useState(1); //tracker del numero massimo di round raggiunto
 
@@ -55,11 +60,15 @@ const GameScreen = () => {
     //2 useeffect diversi in quanto il primo serve per il countdown e il secondo per l'alert
     //se non fosse cosí il round massimo non verrebbe aggiornato
     useEffect(() => {
+        if (!gameStarted) return; // aggiunto
+
         const timer = setInterval(() => {
             setTimeLeft(prev => Math.max(prev - 1, 0));
         }, 1000);
+
         return () => clearInterval(timer);
-    }, []);
+    }, [gameStarted]); // cambiata la dipendenza
+
 
     // 2) alert quando timeLeft arriva a zero
     useEffect(() => {
@@ -84,13 +93,17 @@ const GameScreen = () => {
 
     //effetto che viene eseguito quando il componente viene montato o quando il round cambia
     useEffect(() => {
-        if(!isAudioPlaying) {
+        if (!gameStarted) return; // aggiunto
+
+        if (!isAudioPlaying) {
             player.seekTo(0);
             player.play();
             setIsAudioPlaying(true);
         }
+
         startNewRound();
-    }, [round, forceReset]);
+    }, [gameStarted, round, forceReset]); // aggiunto gameStarted
+
 
     //funzione chiamata all'inizio di un nuovo round dalla useEffect cui sopra
     const startNewRound = () => {
@@ -189,18 +202,31 @@ const GameScreen = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.timerText}>Tempo rimasto: {timeLeft}s</Text>
-            <Text style={styles.roundText}>Round {round}</Text>
-            <View style={styles.grid}>
-                {cards.map((card, index) => (
-                    <FlipCard
-                    key={index}
-                    isFlipped={card.revealed || card.selected}
-                    onPress={() => handleCardPress(index)}
-                    index={index}
-                    />
-                ))}
-            </View>
+            {showModal && (
+                <CountdownModal
+                    text="Memorizza le carte scoperte e selezionale"
+                    onFinish={() => {
+                        setShowModal(false);
+                        setGameStarted(true);
+                    }}
+                />
+            )}
+            {!showModal && (
+                <>
+                <Text style={styles.timerText}>Tempo rimasto: {timeLeft}s</Text>
+                <Text style={styles.roundText}>Round {round}</Text>
+                <View style={styles.grid}>
+                    {cards.map((card, index) => (
+                        <FlipCard
+                        key={index}
+                        isFlipped={card.revealed || card.selected}
+                        onPress={() => handleCardPress(index)}
+                        index={index}
+                        />
+                    ))}
+                </View>
+                </>
+            )}
         </View>
     );
 };

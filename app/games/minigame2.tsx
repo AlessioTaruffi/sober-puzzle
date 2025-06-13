@@ -188,7 +188,7 @@ const checkBalance = (shouldVibrate = true): boolean => {
 
       {showModal && (
         <View style={styles.modal}>
-          <Text style={styles.modalText}>Metti il telefono in testa{'\n'}Posizionati in un'area sicura</Text>
+          <Text style={styles.modalText}>Metti il telefono in testa{'\n'}Posizionati in un'area sicura{'\n'}Cammina finché non senti il suono</Text>
           <Text style={styles.modalCountdown}>{modalCountdown}</Text>
         </View>
       )}

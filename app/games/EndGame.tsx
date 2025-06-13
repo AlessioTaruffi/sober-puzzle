@@ -39,6 +39,8 @@ const gameNameToTitle = (gameName: string) => {
       return 'Light it Up';
     case 'holdsteady':
       return 'Hold Steady';
+    case 'final':
+      return 'Risultati Finali';
     default:
       return gameName.charAt(0).toUpperCase() + gameName.slice(1);
   }

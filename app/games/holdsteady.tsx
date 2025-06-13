@@ -8,7 +8,7 @@ import {
     View,
 } from "react-native";
 import { useGameScore } from './GameScoreContext'; // Assicurati che il percorso sia corretto
-
+import CountdownModal from "./countdownmodal";
 
 export default function holdSteady() {
     const router = useRouter();
@@ -17,6 +17,8 @@ export default function holdSteady() {
     const [promptShown, setPromptShown] = useState(false);
     const [reactionTime, setReactionTime] = useState<number | null>(null);
     const [holdDuration, setHoldDuration] = useState<number | null>(null);
+    const [showModal, setShowModal] = useState(true);
+    const [gameStarted, setGameStarted] = useState(false);
 
     const [currentRound, setCurrentRound] = useState(0);
     const [targetRounds, setTargetRounds] = useState(0);
@@ -63,17 +65,19 @@ export default function holdSteady() {
     }, [startNewRound]);
 
     useEffect(() => {
-        startGame();
+        if (gameStarted) {
+            startGame();
+        }
 
         return () => {
-        if (promptTimeoutRef.current !== null) {
-            clearTimeout(promptTimeoutRef.current);
-        }
-        if (holdTimerRef.current !== null) {
-            clearTimeout(holdTimerRef.current);
-        }
+            if (promptTimeoutRef.current !== null) {
+                clearTimeout(promptTimeoutRef.current);
+            }
+            if (holdTimerRef.current !== null) {
+                clearTimeout(holdTimerRef.current);
+            }
         };
-    }, [startGame]);
+    }, [gameStarted, startGame]);
 
     const handlePressIn = () => {
         if (gamePhase === "ready") {
@@ -284,51 +288,51 @@ export default function holdSteady() {
 
     return (
         <View style={[styles.container, { backgroundColor: getBackgroundColor() }]}>
-
-        {gamePhase === "waiting" && (
-            <Text style={styles.instructions}>Preparati</Text>
-        )}
-        {gamePhase === "ready" && (
-            <Text style={styles.instructions}>PREMI!</Text>
-        )}
-        {gamePhase === "holding" && (
-            <Text style={styles.instructions}>Mantieni</Text>
-        )}
-        {gamePhase === "release" && (
-            <Text style={styles.instructions}>RILASCIA!</Text>
-        )}
-        {/*gamePhase === "done" && (
-            <>
-            <Text style={styles.instructions}>Risultati finali:</Text>
-            {results.map((res, index) => (
-                <Text key={index} style={styles.resultText}>
-                Round {index + 1}: RT {res.reactionTime} ms | Hold{" "}
-                {res.holdDuration} ms | {res.result}
-                </Text>
-            ))}
-            <Pressable onPress={startGame} style={styles.retryButton}>
-                <Text style={styles.retryButtonText}>Riprova</Text>
-            </Pressable>
-            </>
-        )*/}
-        <Text style={styles.subtitle}>
-            Round {Math.min(currentRound + 1, targetRounds)} / {targetRounds}
-        </Text>
-
         
-        {gamePhase !== "done" && (
-            <Pressable
-            onPressIn={handlePressIn}
-            onPressOut={handlePressOut}
-            style={({ pressed }) => [
-                styles.button,
-                pressed && styles.buttonPressed,
-            ]}
-            disabled={!promptShown}
-            >
-            
-            </Pressable>
+        {showModal && (
+            <CountdownModal
+                text="Quando vibra, premi e tieni premuto fino al rilascio"
+                onFinish={() => {
+                    setShowModal(false);
+                    setGameStarted(true);
+                }}
+            />
         )}
+
+        {!showModal && (
+            <>
+                {gamePhase === "waiting" && (
+                    <Text style={styles.instructions}>Preparati</Text>
+                )}
+                {gamePhase === "ready" && (
+                    <Text style={styles.instructions}>PREMI!</Text>
+                )}
+                {gamePhase === "holding" && (
+                    <Text style={styles.instructions}>Mantieni</Text>
+                )}
+                {gamePhase === "release" && (
+                    <Text style={styles.instructions}>RILASCIA!</Text>
+                )}
+
+                <Text style={styles.subtitle}>
+                    Round {Math.min(currentRound + 1, targetRounds)} / {targetRounds}
+                </Text>
+
+                {gamePhase !== "done" && (
+                    <Pressable
+                        onPressIn={handlePressIn}
+                        onPressOut={handlePressOut}
+                        style={({ pressed }) => [
+                            styles.button,
+                            pressed && styles.buttonPressed,
+                        ]}
+                        disabled={!promptShown}
+                    >
+                    </Pressable>
+                )}
+            </>
+        )}
+
         </View>
     );
 }
