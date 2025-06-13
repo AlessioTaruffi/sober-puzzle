@@ -14,7 +14,7 @@ const badgeImages = {
 export const renderers: Record<string, Renderer> = {
   "minigameConta": (data) => (
   <View style={styles.container}>
-    <Text style={styles.title}>🍽️ Memoria Visiva</Text>
+    <Text style={styles.title}>Memoria Visiva</Text>
     <View style={styles.metricRow}>
       <Text style={styles.label}>Birre viste:</Text>
       <Text style={styles.value}>{data.beers.user} / {data.beers.correct}</Text>
@@ -35,15 +35,15 @@ export const renderers: Record<string, Renderer> = {
       {(data.beers.user === data.beers.correct &&
         data.water.user === data.water.correct &&
         data.food.user === data.food.correct)
-        ? 'Tutto corretto! 🎉'
-        : 'Qualcosa non torna... 😕'}
+        ? 'Tutto corretto!'
+        : 'Qualcosa non torna...'}
     </Text>
   </View>
 ),
 
 "minigame1": (data) => (
   <View style={styles.container}>
-    <Text style={styles.title}>⚡ Tempi di Reazione</Text>
+    <Text style={styles.title}>Tempi di Reazione</Text>
     <View style={styles.metricRow}><Text style={styles.label}>Tentativi:</Text><Text style={styles.value}>{data.attempts}</Text></View>
     <View style={styles.metricRow}><Text style={styles.label}>Corrette:</Text><Text style={styles.value}>{data.correct}</Text></View>
     <View style={styles.metricRow}><Text style={styles.label}>Errate:</Text><Text style={styles.value}>{data.wrong}</Text></View>
@@ -53,14 +53,14 @@ export const renderers: Record<string, Renderer> = {
 
 "minigame2": (data) => (
   <View style={styles.container}>
-    <Text style={styles.title}>🧘 Equilibrio</Text>
+    <Text style={styles.title}>Equilibrio</Text>
     <View style={styles.metricRow}><Text style={styles.label}>Tempo equilibrio:</Text><Text style={styles.value}>{data.balanceTime}s</Text></View>
   </View>
 ),
 
 "minigamegolf": (data) => (
   <View style={styles.container}>
-    <Text style={styles.title}>🏌️ Concentrazione</Text>
+    <Text style={styles.title}>Concentrazione</Text>
     <View style={styles.metricRow}><Text style={styles.label}>Tentativi:</Text><Text style={styles.value}>{data.tries}</Text></View>
     <View style={styles.metricRow}><Text style={styles.label}>Esito:</Text><Text style={styles.value}>{data.outcome}</Text></View>
   </View>
@@ -68,28 +68,28 @@ export const renderers: Record<string, Renderer> = {
 
 "minigamememo": (data) => (
   <View style={styles.container}>
-    <Text style={styles.title}>🧠 Memoria</Text>
+    <Text style={styles.title}>Memoria</Text>
     <View style={styles.metricRow}><Text style={styles.label}>Round massimo:</Text><Text style={styles.value}>{data.maxRound}</Text></View>
   </View>
 ),
 
 "minigameTorre": () => (
   <View style={styles.container}>
-    <Text style={styles.title}>🧱 Torre</Text>
+    <Text style={styles.title}>Torre</Text>
     <Text style={styles.feedback}>Gioco in fase sperimentale</Text>
   </View>
 ),
 
 "minigameLigth": (data) => (
   <View style={styles.container}>
-    <Text style={styles.title}>⚡ Riflessi</Text>
+    <Text style={styles.title}>Riflessi</Text>
     <View style={styles.metricRow}><Text style={styles.label}>Tempo medio:</Text><Text style={styles.value}>{data.reactionTime}s</Text></View>
   </View>
 ),
 
 "holdsteady": (data) => (
   <View style={styles.container}>
-    <Text style={styles.title}>🎯 Riflessi</Text>
+    <Text style={styles.title}>Riflessi</Text>
     {data.results.map((res: any) => (
       <View key={res.round} style={styles.metricRow}>
         <Text style={styles.label}>Round {res.round}:</Text>
@@ -108,12 +108,12 @@ export const renderers: Record<string, Renderer> = {
     if (condition) passedChecks++;
   };
 
-  // 🏌️‍♂️ Golf: max 2 tries
+  //Golf: max 2 tries
   if (results.minigamegolf?.tries !== undefined) {
     check(results.minigamegolf.tries <= 2);
   }
 
-  // 🍺 Conta: massimo 1 errore su 3 categorie
+  //Conta: massimo 1 errore su 3 categorie
   if (results.minigameConta) {
     const errCount =
       (results.minigameConta.beers.user !== results.minigameConta.beers.correct ? 1 : 0) +
@@ -122,7 +122,7 @@ export const renderers: Record<string, Renderer> = {
     check(errCount <= 1);
   }
 
-  // ⚡ Reaction Game: minigame1
+  //Reaction Game: minigame1
   if (results.minigame1) {
     const correct = results.minigame1.correct || 0;
     const attempts = results.minigame1.attempts || 1;
@@ -131,22 +131,22 @@ export const renderers: Record<string, Renderer> = {
     check(avgTime <= 1.0 && accuracy >= 0.7);
   }
 
-  // 🧘 Equilibrio: minigame2
+  //Equilibrio: minigame2
   if (results.minigame2?.balanceTime !== undefined) {
     check(results.minigame2.balanceTime > 5);
   }
 
-  // 🧠 Memoria: minigamememo
+  //Memoria: minigamememo
   if (results.minigamememo?.maxRound !== undefined) {
     check(results.minigamememo.maxRound >= 4);
   }
 
-  // ⚡ Riflessi: minigameLigth
+  //Riflessi: minigameLigth
   if (results.minigameLigth?.reactionTime !== undefined) {
     check(results.minigameLigth.reactionTime <= 0.6);
   }
 
-  // 🎯 HoldSteady: almeno 70% successi
+  //HoldSteady: almeno 70% successi
   if (results.holdsteady?.results) {
     const totalRounds = results.holdsteady.results.length;
     const successCount = results.holdsteady.results.filter(
@@ -163,22 +163,22 @@ export const renderers: Record<string, Renderer> = {
     : 'Instabile';
 
   const badgePhrase = {
-    Stabile: '🧊 Mente lucida e stabile!',
-    Variabile: '🌀 Alcuni segnali di variabilità',
-    Instabile: '🔥 Instabilità significativa',
+    Stabile: 'Mente lucida e stabile!',
+    Variabile: 'Alcuni segnali di variabilità',
+    Instabile: 'Instabilità significativa',
   }[stabilityLabel];
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>🧠 Riepilogo Finale</Text>
+      <Text style={styles.title}>Riepilogo Finale</Text>
       
       <View style={styles.metricRow}>
-        <Text style={styles.label}>🔍 Stabilità calcolata:</Text>
+        <Text style={styles.label}>Stabilità calcolata:</Text>
         <Text style={styles.value}>{stabilityPercent.toFixed(1)}%</Text>
       </View>
 
       <View style={styles.metricRow}>
-        <Text style={styles.label}>📊 Classificazione:</Text>
+        <Text style={styles.label}>Classificazione:</Text>
         <Text style={styles.value}>{stabilityLabel}</Text>
       </View>
 
