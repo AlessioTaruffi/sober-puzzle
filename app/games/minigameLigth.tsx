@@ -121,14 +121,11 @@ export default function App() {
       const media = reactionTimes.current.length
       ? (reactionTimes.current.reduce((a, b) => a + b) / reactionTimes.current.length).toFixed(0)
       : 'N/A';
-      console.log("media calcolata");
       const result = {
         name: 'Minigame Ligth',
         reactionTime: media	
       }
-      console.log("risultati calcolati");
       addResult.addResult('minigameLigth', result);
-      console.log("risultati aggiunti");
       router.push({ pathname: '/games/EndGame', params: { gameName: 'minigameLigth' } });
     }
   }, [gameEnd]);
@@ -148,7 +145,7 @@ export default function App() {
   if (!permission.granted) {
     return (
       <View style={styles.container}>
-        <Text style={styles.message}>We need your permission to show the camera</Text>
+        <Text style={styles.message}>We need your permission to use the camera</Text>
         <Button onPress={requestPermission} title="Grant Permission" />
       </View>
     );
@@ -162,7 +159,7 @@ export default function App() {
 
       {showModal && (
         <CountdownModal
-          text="Scuoti il telefono quando la luce si accende"
+          text="Shake the phone when the light turns on"
           onFinish={() => {
             setShowModal(false);
             setGameStarted(true);

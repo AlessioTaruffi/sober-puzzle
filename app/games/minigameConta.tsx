@@ -134,7 +134,7 @@ export default function MinigameConta({
     <View style={styles.container}>
       {showModal && (
         <CountdownModal
-          text="Conta quanti oggetti passano nel bar"
+          text="Count how many objects are in the bar"
           onFinish={() => {
             setShowModal(false);
             setGameStarted(true);
@@ -148,9 +148,9 @@ export default function MinigameConta({
 
           {gameOver ? (
             <View style={styles.container}>
-              <Text style={styles.title}>Quanta roba hai visto?</Text>
+              <Text style={styles.title}>How much stuff have you seen?</Text>
 
-              <Text style={{ fontSize: 18, marginTop: 20 }}>Birre: {userBeerInput}</Text>
+              <Text style={{ fontSize: 18, marginTop: 20 }}>Beers: {userBeerInput}</Text>
               <View style={styles.sliderRow}>
                 <Text>0</Text>
                 <Slider
@@ -164,7 +164,7 @@ export default function MinigameConta({
                 <Text>{numPassers}</Text>
               </View>
 
-              <Text style={{ fontSize: 18, marginTop: 20 }}>Acqua: {userWaterInput}</Text>
+              <Text style={{ fontSize: 18, marginTop: 20 }}>Waters: {userWaterInput}</Text>
               <View style={styles.sliderRow}>
                 <Text>0</Text>
                 <Slider
@@ -178,7 +178,7 @@ export default function MinigameConta({
                 <Text>{numPassers}</Text>
               </View>
 
-              <Text style={{ fontSize: 18, marginTop: 20 }}>Cibo: {userFoodInput}</Text>
+              <Text style={{ fontSize: 18, marginTop: 20 }}>Foods: {userFoodInput}</Text>
               <View style={styles.sliderRow}>
                 <Text>0</Text>
                 <Slider
@@ -193,7 +193,7 @@ export default function MinigameConta({
               </View>
 
               <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-                <Text style={styles.buttonText}>Verifica</Text>
+                <Text style={styles.buttonText}>Verify</Text>
               </TouchableOpacity>
             </View>
           ) : (

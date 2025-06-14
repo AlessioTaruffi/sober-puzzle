@@ -291,7 +291,7 @@ export default function holdSteady() {
         
         {showModal && (
             <CountdownModal
-                text="Quando vibra, premi e tieni premuto fino al rilascio"
+                text="When the phone vibrates, press and hold the button."
                 onFinish={() => {
                     setShowModal(false);
                     setGameStarted(true);
@@ -302,16 +302,16 @@ export default function holdSteady() {
         {!showModal && (
             <>
                 {gamePhase === "waiting" && (
-                    <Text style={styles.instructions}>Preparati</Text>
+                    <Text style={styles.instructions}>Get Ready</Text>
                 )}
                 {gamePhase === "ready" && (
-                    <Text style={styles.instructions}>PREMI!</Text>
+                    <Text style={styles.instructions}>PUSH!</Text>
                 )}
                 {gamePhase === "holding" && (
-                    <Text style={styles.instructions}>Mantieni</Text>
+                    <Text style={styles.instructions}>Hold Steady</Text>
                 )}
                 {gamePhase === "release" && (
-                    <Text style={styles.instructions}>RILASCIA!</Text>
+                    <Text style={styles.instructions}>RELEASE!</Text>
                 )}
 
                 <Text style={styles.subtitle}>

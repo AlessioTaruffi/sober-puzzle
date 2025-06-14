@@ -204,7 +204,7 @@ const GameScreen = () => {
         <View style={styles.container}>
             {showModal && (
                 <CountdownModal
-                    text="Memorizza le carte scoperte e selezionale"
+                    text="Memorize and select the cards that will be shown"
                     onFinish={() => {
                         setShowModal(false);
                         setGameStarted(true);
@@ -213,7 +213,7 @@ const GameScreen = () => {
             )}
             {!showModal && (
                 <>
-                <Text style={styles.timerText}>Tempo rimasto: {timeLeft}s</Text>
+                <Text style={styles.timerText}>Time Left: {timeLeft}s</Text>
                 <Text style={styles.roundText}>Round {round}</Text>
                 <View style={styles.grid}>
                     {cards.map((card, index) => (

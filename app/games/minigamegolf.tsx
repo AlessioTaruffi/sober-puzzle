@@ -340,7 +340,7 @@ export default function MinigameGolf() {
 
         {showModal && (
             <CountdownModal
-                text="Guida la pallina nella buca senza uscire dal percorso"
+                text="Guide the golf ball to the hole"
                 onFinish={() => {
                     setShowModal(false);
                     setGameStarted(true);
@@ -366,7 +366,7 @@ export default function MinigameGolf() {
 
             {(isCalibrating) && (
                 <View style={styles.message}>
-                    <Text style={styles.winText}>Calibrazione...</Text>
+                    <Text style={styles.winText}>Calibration...</Text>
                 </View>
             )}
             </>

@@ -209,7 +209,7 @@ export default function minigame1() {
     <View style={styles.container}>
       {showModal && (
         <CountdownModal
-          text="Premi il colore mostrato il più velocemente possibile"
+          text="Press the button matching the shown colour"
           onFinish={() => {
             setShowModal(false);
             setGameStarted(true);

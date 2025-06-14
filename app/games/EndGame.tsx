@@ -61,7 +61,7 @@ export default function EndScreen(){
   console.log('data:', data);
   //const PressText = nextGameRoute === "final" ? "Fine del gioco" : "Prossimo gioco";
   
-  const PressText = nextGameRoute ? nextGameRoute === "final" ? "final Score" : "Next Game" : "Back to Home";
+  const PressText = nextGameRoute ? nextGameRoute === "final" ? "Final Score" : "Next Game" : "Back to Home";
 
   return (
   <GameScoreProvider>
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   button: {
-    backgroundColor: '#68f2c2',
+    backgroundColor: '#84bce8',
     paddingVertical: 14,
     paddingHorizontal: 20,
     borderRadius: 12,
