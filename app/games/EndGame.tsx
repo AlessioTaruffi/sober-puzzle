@@ -59,7 +59,9 @@ export default function EndScreen(){
   const data = gameName === "final" ? results : results[gameName];
   const Renderer = renderers[gameName];
   console.log('data:', data);
-  const PressText = nextGameRoute === "final" ? "Fine del gioco" : "Prossimo gioco";
+  //const PressText = nextGameRoute === "final" ? "Fine del gioco" : "Prossimo gioco";
+  
+  const PressText = nextGameRoute ? nextGameRoute === "final" ? "final Score" : "Next Game" : "Back to Home";
 
   return (
   <GameScoreProvider>
