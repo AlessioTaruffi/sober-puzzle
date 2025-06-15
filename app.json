@@ -16,7 +16,8 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.donmatteoorg.soberpuzzle"
     },
     "web": {
       "bundler": "metro",
@@ -35,7 +36,7 @@
         }
       ],
       [
-      "expo-audio",
+        "expo-audio",
         {
           "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone."
         }
