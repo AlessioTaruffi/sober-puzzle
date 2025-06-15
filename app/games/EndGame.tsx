@@ -40,7 +40,7 @@ const gameNameToTitle = (gameName: string) => {
     case 'holdsteady':
       return 'Hold Steady';
     case 'final':
-      return 'Risultati Finali';
+      return 'Final Results';
     default:
       return gameName.charAt(0).toUpperCase() + gameName.slice(1);
   }
@@ -106,7 +106,7 @@ export default function EndScreen(){
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#68f2c2',
+    backgroundColor: '#84bce8',
     padding: 0,
   },
   headerText: {

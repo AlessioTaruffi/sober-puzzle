@@ -236,7 +236,7 @@ export const styles = StyleSheet.create({
   },
   label: {
     fontSize: 22,
-    color: '#6b6b6b',
+    color: 'black',
     fontWeight: '500',
   },
   value: {

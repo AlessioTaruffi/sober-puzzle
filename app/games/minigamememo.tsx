@@ -54,6 +54,11 @@ const GameScreen = () => {
     const audioSource = require('../../assets/audio/tictaclungo.mp3');
     const player = useAudioPlayer(audioSource);
 
+    const audioGiusto = require('../../assets/audio/correct.mp3');
+    const audioSbagliato = require('../../assets/audio/wrong.mp3');
+    const playerGiusto = useAudioPlayer(audioGiusto);
+    const playerSbagliato = useAudioPlayer(audioSbagliato);
+
     //effetto per il countdown globale
     //viene eseguito ogni secondo e decrementa il tempo rimasto
     //allo scadere del tempo rilascia un alert e dá l'opzione di ricominciare
@@ -159,6 +164,8 @@ const GameScreen = () => {
         // 3. Verifica se ha selezionato una carta sbagliata
         if (!targetIndices.includes(index)) {
             Vibration.vibrate(300);
+            playerSbagliato.seekTo(0);
+            playerSbagliato.play();
             setTimeout(() => {
                 setRound(1);
                 setForceReset((prev) => prev + 1);
@@ -188,6 +195,8 @@ const GameScreen = () => {
         if (success) {
             setMaxRound((prev) => Math.max(prev, round)); //aggiorna il numero massimo di round se necessario
             Vibration.vibrate(80); 
+            playerGiusto.seekTo(0);
+            playerGiusto.play();
             setTimeout(() => {
                 setRound((prev) => prev + 1); 
             }, 200); //passa al round successivo dopo un breve ritardo
