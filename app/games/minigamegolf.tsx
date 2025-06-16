@@ -1,4 +1,5 @@
 import { Text } from "@react-navigation/elements";
+import * as Haptics from 'expo-haptics';
 import { useRouter } from "expo-router";
 import { Gyroscope } from 'expo-sensors';
 import { useEffect, useRef, useState } from 'react';
@@ -6,6 +7,7 @@ import { Dimensions, StyleSheet, Vibration, View } from "react-native";
 import Svg, { Path } from 'react-native-svg';
 import { useGameScore } from "./GameScoreContext";
 import CountdownModal from "./countdownmodal";
+
 
 export default function MinigameGolf() {
 
@@ -283,6 +285,48 @@ export default function MinigameGolf() {
         //o quando x ed y cambiano
         return () => clearInterval(interval);
     }, [x, y, hasWon, hasLost]);
+
+    useEffect(() => {
+        let isVibrating = false;
+
+        const vibrationInterval = setInterval(async () => {
+            if (hasWon || hasLost || isVibrating) return;
+
+            const { vx, vy } = velocityRef.current;
+            const speed = Math.sqrt(vx * vx + vy * vy);
+
+            const minSpeedThreshold = 0.5;
+            const maxSpeed = 20;
+
+            if (speed > minSpeedThreshold) {
+                const normalizedSpeed = Math.min(speed / maxSpeed, 1);
+
+                isVibrating = true;
+
+                try {
+                    if (normalizedSpeed < 0.1) {
+                        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        console.log("Vibrazione leggera");
+                    } else if (normalizedSpeed < 0.13) {
+                        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                        console.log("Vibrazione media");
+                    } else {
+                        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+                        console.log("Vibrazione forte");
+                    }
+                } catch (e) {
+                    console.warn("Errore nella vibrazione:", e);
+                }
+
+                isVibrating = false;
+            }
+        }, 200); // ogni 200ms → più realistico
+
+        return () => clearInterval(vibrationInterval);
+    }, [hasWon, hasLost]);
+
+
+
 
     useEffect(() => {
         if (hasWon) {
