@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  Vibration,
   View
 } from 'react-native';
 import { useGameScore } from './GameScoreContext';
@@ -159,7 +160,7 @@ export default function MinigameConta({
                   maximumValue={numPassers}
                   step={1}
                   value={userBeerInput}
-                  onValueChange={setUserBeerInput}
+                  onValueChange={(val) => {setUserBeerInput(val);Vibration.vibrate(10);}}
                 />
                 <Text>{numPassers}</Text>
               </View>
@@ -173,7 +174,7 @@ export default function MinigameConta({
                   maximumValue={numPassers}
                   step={1}
                   value={userWaterInput}
-                  onValueChange={setUserWaterInput}
+                  onValueChange={(val) => {setUserWaterInput(val); Vibration.vibrate(10);}}
                 />
                 <Text>{numPassers}</Text>
               </View>
@@ -187,7 +188,7 @@ export default function MinigameConta({
                   maximumValue={numPassers}
                   step={1}
                   value={userFoodInput}
-                  onValueChange={setUserFoodInput}
+                  onValueChange={(val)=>{setUserFoodInput(val); Vibration.vibrate(10);}}
                 />
                 <Text>{numPassers}</Text>
               </View>
