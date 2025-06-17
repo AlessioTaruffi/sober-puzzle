@@ -263,6 +263,7 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 20,
         justifyContent: 'center',
+        backgroundColor: '#f0f0f0',
     },
     roundText: {
         fontSize: 28,
